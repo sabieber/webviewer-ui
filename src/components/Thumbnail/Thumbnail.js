@@ -19,6 +19,7 @@ class Thumbnail extends React.PureComponent {
     onCancel: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,
     closeElement: PropTypes.func.isRequired,
+    customContentRenderer: PropTypes.func
   }
 
   constructor(props) {
@@ -60,7 +61,7 @@ class Thumbnail extends React.PureComponent {
   }
 
   render() {
-    const { index, currentPage, pageLabels } = this.props;
+    const { index, currentPage, pageLabels, customContentRenderer } = this.props;
     const isActive = currentPage === index + 1;
     const pageLabel = pageLabels[index];
 
@@ -68,6 +69,11 @@ class Thumbnail extends React.PureComponent {
       <div className={`Thumbnail ${isActive ? 'active' : ''}`}>
         <div className="container" ref={this.thumbContainer} onClick={this.handleClick}></div>
         <div className="page-label">{pageLabel}</div>
+        { customContentRenderer &&
+        <div className="customContent">
+          {customContentRenderer(index, React)}
+        </div>
+        }
       </div>
     );
   }
@@ -75,7 +81,8 @@ class Thumbnail extends React.PureComponent {
 
 const mapStateToProps = state => ({
   currentPage: selectors.getCurrentPage(state),
-  pageLabels: selectors.getPageLabels(state)
+  pageLabels: selectors.getPageLabels(state),
+  customContentRenderer: selectors.getThumbnailCustomContentRenderer(state)
 });
 
 const mapDispatchToProps = {

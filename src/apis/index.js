@@ -63,6 +63,7 @@ import disableTools from './disableTools';
 import isToolDisabled from './isToolDisabled';
 import setNotesPanelSort from './setNotesPanelSort';
 import updateOutlines from './updateOutlines';
+import setThumbnailCustomContentRenderer from './setThumbnailCustomContentRenderer';
 
 export default {
   loadDocument,
@@ -129,5 +130,6 @@ export default {
   disableTools,
   isToolDisabled,
   setNotesPanelSort,
-  updateOutlines
+  updateOutlines,
+  setThumbnailCustomContentRenderer
 };

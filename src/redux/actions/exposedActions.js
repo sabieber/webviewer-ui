@@ -108,5 +108,6 @@ export const setPageLabels = pageLabels => dispatch => {
   }
   dispatch({ type: 'SET_PAGE_LABELS', payload: { pageLabels } });
 };
-
-
+export const setThumbnailCustomContentRenderer = thumbnailCustomContentRenderer => {
+  return ({type: 'SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER', payload: {thumbnailCustomContentRenderer}});
+};
