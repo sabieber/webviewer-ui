@@ -149,4 +149,6 @@ export const setZoomList = zoomList => dispatch => {
   
   dispatch({ type: 'SET_ZOOM_LIST', payload: { zoomList: filteredZoomList } });
 };
-  
+export const setThumbnailCustomContentRenderer = thumbnailCustomContentRenderer => {
+  return ({type: 'SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER', payload: {thumbnailCustomContentRenderer}});
+};

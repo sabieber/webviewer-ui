@@ -143,13 +143,15 @@ export default initialState => (state = initialState, action) => {
     case 'SET_CURSOR_OVERLAY': {
       const { imgSrc, width, height } = payload.data;
 
-      return { 
-        ...state, 
-        cursorOverlay: { imgSrc, width, height } 
+      return {
+        ...state,
+        cursorOverlay: { imgSrc, width, height }
       };
     }
     case 'SET_SWIPE_ORIENTATION':
       return { ...state, swipeOrientation: payload.swipeOrientation };
+    case 'SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER':
+      return { ...state, thumbnailCustomContentRenderer: payload.thumbnailCustomContentRenderer };
     case 'SET_WARNING_MESSAGE':
       return { ...state, warning: payload};
     case 'SET_CUSTOM_NOTE_FILTER':

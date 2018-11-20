@@ -73,6 +73,7 @@ import addSortStrategy from './addSortStrategy';
 import updateOutlines from './updateOutlines';
 import updateTool from './updateTool';
 import print from './print';
+import setThumbnailCustomContentRenderer from './setThumbnailCustomContentRenderer';
 import showWarningMessage from './showWarningMessage';
 import enableRedaction from './enableRedaction';
 import disableRedaction from './disableRedaction';
@@ -158,6 +159,7 @@ export default {
   setZoomLevel,
   setMaxZoomLevel,
   setMinZoomLevel,
+  setThumbnailCustomContentRenderer,
   showWarningMessage,
   enableRedaction,
   disableRedaction,
