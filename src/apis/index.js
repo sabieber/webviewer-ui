@@ -70,6 +70,7 @@ import setNotesPanelSort from './setNotesPanelSort';
 import addSortStrategy from './addSortStrategy';
 import updateOutlines from './updateOutlines';
 import print from './print';
+import setThumbnailCustomContentRenderer from './setThumbnailCustomContentRenderer';
 
 export default {
   loadDocument,
@@ -146,5 +147,6 @@ export default {
   getZoomLevel,
   setZoomLevel,
   setMaxZoomLevel,
-  setMinZoomLevel
+  setMinZoomLevel,
+  setThumbnailCustomContentRenderer,
 };

@@ -125,4 +125,7 @@ export const setPageLabels = pageLabels => dispatch => {
   dispatch({ type: 'SET_PAGE_LABELS', payload: { pageLabels: pageLabels.map(String) } });
 };
 export const setSwipeOrientation = swipeOrientation => ({ type: 'SET_SWIPE_ORIENTATION', payload: { swipeOrientation } });
-  
+
+export const setThumbnailCustomContentRenderer = thumbnailCustomContentRenderer => {
+  return ({type: 'SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER', payload: {thumbnailCustomContentRenderer}});
+};

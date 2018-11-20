@@ -140,6 +140,8 @@ export default initialState => (state = initialState, action) => {
       return { ...state, colorMap: payload.colorMap };
     case 'SET_SWIPE_ORIENTATION':
       return { ...state, swipeOrientation: payload.swipeOrientation };
+    case 'SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER':
+      return { ...state, thumbnailCustomContentRenderer: payload.thumbnailCustomContentRenderer };
     default:
       return state;
   }
