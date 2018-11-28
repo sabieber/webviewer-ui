@@ -113,6 +113,7 @@ export const setSortNotesBy = sortStrategy => {
   return setSortStrategy(sortStrategy);
 };
 export const setNoteDateFormat = noteDateFormat => ({ type: 'SET_NOTE_DATE_FORMAT', payload: { noteDateFormat } });
+export const setNoteCustomContentRenderer = noteCustomContentRenderer => ({ type: 'SET_NOTE_CUSTOM_CONTENT_RENDERER', payload: { noteCustomContentRenderer } });
 export const updateTool = (toolName, properties) => ({ type: 'UPDATE_TOOL', payload: { toolName, properties } });
 export const setCustomPanel = newPanel => ({ type: 'SET_CUSTOM_PANEL', payload: { newPanel } });
 export const useEmbeddedPrint = (useEmbeddedPrint = true) => ({ type: 'USE_EMBEDDED_PRINT', payload: { useEmbeddedPrint } });

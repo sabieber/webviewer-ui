@@ -27,7 +27,12 @@ class NoteRoot extends React.Component {
     numberOfReplies: PropTypes.number.isRequired,
     noteDateFormat: PropTypes.string,
     iconColor: PropTypes.oneOf(['TextColor', 'StrokeColor', 'FillColor']),
-    contents: PropTypes.string
+    contents: PropTypes.string,
+    noteCustomContentRenderer: PropTypes.func
+  }
+
+  constructor(props) {
+    super(props);
   }
 
   componentDidMount() {
@@ -84,15 +89,20 @@ class NoteRoot extends React.Component {
   }
 
   render() {
-    const { annotation, renderContents, isEditing, closeEditing, searchInput, contents } = this.props;
+    const { annotation, renderContents, isEditing, closeEditing, searchInput, contents, noteCustomContentRenderer } = this.props;
 
     return(
       <div className="NoteRoot">
         {this.renderHeader()}
-        <NoteContents 
+        { noteCustomContentRenderer &&
+          <div className="customContent">
+            {noteCustomContentRenderer(annotation, React)}
+          </div>
+        }
+        <NoteContents
           annotation={annotation} 
           contents={contents}
-          searchInput={searchInput} 
+          searchInput={searchInput}
           renderContents={renderContents} 
           isEditing={isEditing} 
           closeEditing={closeEditing} 
@@ -105,7 +115,8 @@ class NoteRoot extends React.Component {
 const mapStateToProps = (state, { annotation }) => ({
   sortStrategy: selectors.getSortStrategy(state),
   noteDateFormat: selectors.getNoteDateFormat(state),
-  iconColor: selectors.getIconColor(state, mapAnnotationToKey(annotation))
+  iconColor: selectors.getIconColor(state, mapAnnotationToKey(annotation)),
+  noteCustomContentRenderer: selectors.getNoteCustomContentRenderer(state)
 });
 
 export default connect(mapStateToProps)(NoteRoot);
