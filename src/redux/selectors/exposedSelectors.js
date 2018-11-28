@@ -28,6 +28,7 @@ export const getDisplayMode = state => state.viewer.displayMode;
 export const getCurrentPage = state => state.viewer.currentPage;
 export const getSortNotesBy = state => state.viewer.sortNotesBy;
 export const getNoteDateFormat = state => state.viewer.noteDateFormat;
+export const getNoteCustomContentRenderer = state => state.viewer.noteCustomContentRenderer;
 export const isFullScreen = state => state.viewer.isFullScreen;
 export const doesDocumentAutoLoad = state => state.viewer.doesAutoLoad;
 export const isDocumentLoaded = state => state.viewer.isDocumentLoaded;

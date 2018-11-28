@@ -4,6 +4,7 @@ import downloadPdf from './downloadPdf';
 import getAnnotationUser from './getAnnotationUser';
 import setAnnotationUser from './setAnnotationUser';
 import setNoteDateFormat from './setNoteDateFormat';
+import setNoteCustomContentRenderer from './setNoteCustomContentRenderer';
 import getZoomLevel from './getZoomLevel';
 import setZoomLevel from './setZoomLevel';
 import isReadOnly from './isReadOnly';
@@ -69,6 +70,7 @@ export default {
   downloadPdf,
   getAnnotationUser,
   setNoteDateFormat,
+  setNoteCustomContentRenderer,
   setAnnotationUser,
   getZoomLevel,
   setZoomLevel,

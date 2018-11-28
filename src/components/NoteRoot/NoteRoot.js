@@ -28,7 +28,8 @@ class NoteRoot extends React.Component {
     openEditing: PropTypes.func.isRequired,
     closeEditing: PropTypes.func.isRequired,
     numberOfReplies: PropTypes.number.isRequired,
-    noteDateFormat: PropTypes.string
+    noteDateFormat: PropTypes.string,
+    noteCustomContentRenderer: PropTypes.func
   }
 
   constructor(props) { 
@@ -92,12 +93,17 @@ class NoteRoot extends React.Component {
   }
 
   render() {
-    const { annotation, renderContents, isEditing, closeEditing, searchInput } = this.props;
+    const { annotation, renderContents, isEditing, closeEditing, searchInput, noteCustomContentRenderer } = this.props;
 
     return(
       <div className="NoteRoot">
         {this.renderHeader()}
-        <NoteContents 
+        { noteCustomContentRenderer &&
+          <div className="customContent">
+            {noteCustomContentRenderer(annotation, React)}
+          </div>
+        }
+        <NoteContents
           annotation={annotation} 
           searchInput={searchInput} 
           renderContents={renderContents} 
@@ -111,7 +117,8 @@ class NoteRoot extends React.Component {
 
 const mapStateToProps = state => ({
   sortNotesBy: selectors.getSortNotesBy(state),
-  noteDateFormat: selectors.getNoteDateFormat(state)
+  noteDateFormat: selectors.getNoteDateFormat(state),
+  noteCustomContentRenderer: selectors.getNoteCustomContentRenderer(state)
 });
 
 export default connect(mapStateToProps)(NoteRoot);
