@@ -1,9 +1,10 @@
 import actions from 'actions';
 import core from 'core';
-import toolStyleExists from 'helpers/toolStyleExists';
+import toolStylesExist from 'helpers/toolStylesExist';
 
-export default (dispatch, toolName, toolGroup) =>  {
-  if (core.getIsReadOnly()) {
+export default (dispatch, toolName, toolGroup) => {
+  if (core.getIsReadOnly() || core.getTool(toolName).disabled) { // TODO: revisit
+    console.warn(`${toolName} has been disabled.`);
     return;
   }
 
@@ -12,14 +13,14 @@ export default (dispatch, toolName, toolGroup) =>  {
   } else {
     dispatch(actions.closeElement('toolsOverlay'));
   }
-  
+
   const hasToolBeenSelected = core.getToolMode().name === toolName;
-  if (hasToolBeenSelected && toolStyleExists(toolName)) {
+  if (hasToolBeenSelected && toolStylesExist(toolName)) {
     dispatch(actions.toggleElement('toolStylePopup'));
     return;
   }
-  
-  if (window.innerWidth <= 900) {
+
+  if (window.innerWidth <= 900 && toolName !== 'Pan' && toolName !== 'AnnotationEdit') { // TODO: revisit
     dispatch(actions.setActiveHeaderGroup('tools'));
   }
 

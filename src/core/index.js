@@ -18,6 +18,8 @@ import getAnnotationManager from './getAnnotationManager';
 import getTotalPages from './getTotalPages';
 import getCurrentPage from './getCurrentPage';
 import setCurrentPage from './setCurrentPage';
+import getType from './getType';
+import isWebViewerServerDocument from './isWebViewerServerDocument';
 import getSelectedText from './getSelectedText';
 import clearSelection from './clearSelection';
 import setOptions from './setOptions';
@@ -56,6 +58,11 @@ import pasteCopiedAnnotations from './pasteCopiedAnnotations';
 import selectAnnotation from './selectAnnotation';
 import selectAnnotations from './selectAnnotations';
 import addAnnotations from './addAnnotations';
+import applyRedactions from './applyRedactions';
+import isCreateRedactionEnabled from './isCreateRedactionEnabled';
+import isApplyRedactionEnabled from './isApplyRedactionEnabled';
+import isAnnotationRedactable from './isAnnotationRedactable';
+import enableRedaction from './enableRedaction';
 import drawAnnotationsFromList from './drawAnnotationsFromList';
 import setInternalAnnotationsTransform from './setInternalAnnotationsTransform';
 import setPagesUpdatedInternalAnnotationsTransform from './setPagesUpdatedInternalAnnotationsTransform';
@@ -65,6 +72,7 @@ import getSelectedTextQuads from './getSelectedTextQuads';
 import getDisplayModeObject from './getDisplayModeObject';
 import getScrollViewElement from './getScrollViewElement';
 import getAnnotationById from './getAnnotationById';
+import isFullPDFEnabled from './isFullPDFEnabled';
 import isAnnotationSelected from './isAnnotationSelected';
 import setAnnotationStyles from './setAnnotationStyles';
 import deselectAnnotation from './deselectAnnotation';
@@ -80,6 +88,7 @@ import cancelLoadThumbnail from './cancelLoadThumbnail';
 import showAnnotations from './showAnnotations';
 import hideAnnotations from './hideAnnotations';
 import goToOutline from './goToOutline';
+import getViewerElement from './getViewerElement';
 import { addEventListener, removeEventListener } from './eventListener';
 
 export default {
@@ -103,6 +112,8 @@ export default {
   getTotalPages,
   getCurrentPage,
   setCurrentPage,
+  getType,
+  isWebViewerServerDocument,
   getSelectedText,
   clearSelection,
   setOptions,
@@ -141,6 +152,11 @@ export default {
   selectAnnotation,
   selectAnnotations,
   addAnnotations,
+  applyRedactions,
+  isCreateRedactionEnabled,
+  isApplyRedactionEnabled,
+  isAnnotationRedactable,
+  enableRedaction,
   drawAnnotationsFromList,
   setInternalAnnotationsTransform,
   setPagesUpdatedInternalAnnotationsTransform,
@@ -150,6 +166,7 @@ export default {
   getDisplayModeObject,
   getScrollViewElement,
   getAnnotationById,
+  isFullPDFEnabled,
   isAnnotationSelected,
   setAnnotationStyles,
   deselectAnnotation,
@@ -166,5 +183,6 @@ export default {
   cancelLoadThumbnail,
   showAnnotations,
   hideAnnotations,
-  goToOutline
+  goToOutline,
+  getViewerElement,
 };

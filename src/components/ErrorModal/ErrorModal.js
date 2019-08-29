@@ -1,76 +1,83 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { translate } from 'react-i18next';
+import React, { useEffect } from 'react';
+import classNames from 'classnames';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
-import getClassName from 'helpers/getClassName';
 import actions from 'actions';
 import selectors from 'selectors';
 
 import './ErrorModal.scss';
 
-class ErrorModal extends React.PureComponent {
-  static propTypes = {
-    isDisabled: PropTypes.bool,
-    isOpen: PropTypes.bool,
-    openElement: PropTypes.func.isRequired,
-    closeElements: PropTypes.func.isRequired,
-    t: PropTypes.func.isRequired
-  }
+const ErrorModal = () => {
+  const [message, isDisabled, isOpen, documentPath] = useSelector(
+    state => [
+      selectors.getErrorMessage(state),
+      selectors.isElementDisabled(state, 'errorModal'),
+      selectors.isElementOpen(state, 'errorModal'),
+      selectors.getDocumentPath(state),
+    ],
+    shallowEqual,
+  );
+  const dispatch = useDispatch();
+  const [t] = useTranslation();
 
-  state = {
-    errorMessage: ''
-  }
-
-  componentDidMount() {
-    window.addEventListener('loaderror', this.onError);
-  }
-
-  componentDidUpdate(prevProps) {
-    if (!prevProps.isOpen && this.props.isOpen) {
-      this.props.closeElements([ 'signatureModal', 'printModal', 'loadingModal' ]);
+  useEffect(() => {
+    if (isOpen) {
+      dispatch(
+        actions.closeElements([
+          'signatureModal',
+          'printModal',
+          'loadingModal',
+          'progressModal',
+        ]),
+      );
     }
-  }
+  }, [dispatch, isOpen]);
 
-  componentWillUnmount() {
-    window.removeEventListener('loaderror', this.onError);
-  }
+  useEffect(() => {
+    const onError = error => {
+      if (documentPath.indexOf('file:///') > -1) {
+        console.error(
+          `WebViewer doesn't have access to file URLs because of browser security restrictions. Please see https://www.pdftron.com/documentation/web/guides/basics/troubleshooting-document-loading#not-allowed-to-load-local-resource:-file:`,
+        );
+      }
 
-  onError = error => {
-    this.props.openElement('errorModal');
+      error = error.detail || error.message;
+      let errorMessage;
 
-    let errorMessage = '' + (error.detail || error.message);
-    if (errorMessage.indexOf('File does not exist') > -1) {
-      errorMessage = this.props.t('message.notSupported');
-    }
+      if (typeof error === 'string') {
+        errorMessage = error;
 
-    this.setState({ errorMessage });
-  }
+        // provide a more specific error message
+        if (errorMessage.indexOf('File does not exist') > -1) {
+          errorMessage = t('message.notSupported');
+        }
+      } else if (error?.type === 'InvalidPDF') {
+        errorMessage = t('message.badDocument');
+      }
 
-  render() {
-    if (this.props.isDisabled) {
-      return null;
-    }
+      if (errorMessage) {
+        dispatch(actions.showErrorMessage(errorMessage));
+      }
+    };
 
-    const { errorMessage } = this.state;
-    const className = getClassName('Modal ErrorModal', this.props);
+    window.addEventListener('loaderror', onError);
+    return () => window.removeEventListener('loaderror', onError);
+  }, [dispatch, documentPath, t]);
 
-    return (
-      <div className={className} data-element="errorModal">
-          <div className="container">{errorMessage}</div>
-      </div>
-    );
-  }
-}
-
-const mapStateToProps = state => ({
-  isDisabled: selectors.isElementDisabled(state, 'errorModal'),
-  isOpen: selectors.isElementOpen(state, 'errorModal'),
-});
-
-const mapDispatchToProps = {
-  openElement: actions.openElement,
-  closeElements: actions.closeElements,
+  return isDisabled ? null : (
+    <div
+      className={classNames({
+        Modal: true,
+        ErrorModal: true,
+        open: isOpen,
+        closed: !isOpen,
+      })}
+      data-element="errorModal"
+    >
+      <div className="container">{message}</div>
+    </div>
+  );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate()(ErrorModal));
+export default ErrorModal;

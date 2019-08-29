@@ -1,69 +1,54 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import ReactTooltip from 'react-tooltip';
-import { translate } from 'react-i18next';
+import { withTranslation } from 'react-i18next';
+
+import Tooltip from 'components/Tooltip';
 
 import getBrightness from 'helpers/getBrightness';
+import { getDataWithKey } from 'constants/map';
+import actions from 'actions';
 
 import './ColorPaletteHeader.scss';
 
 class ColorPaletteHeader extends React.PureComponent {
   static propTypes = {
     style: PropTypes.object.isRequired,
-    colorPalette: PropTypes.string.isRequired,
-    onHeaderChange: PropTypes.func.isRequired,
+    colorPalette: PropTypes.oneOf(['TextColor', 'StrokeColor', 'FillColor']),
+    colorMapKey: PropTypes.string.isRequired,
+    setColorPalette: PropTypes.func.isRequired,
     t: PropTypes.func.isRequired,
   }
 
-  constructor(props) {
-    super(props);
-  }
+  setColorPalette = newPalette => {
+    const { setColorPalette, colorMapKey } = this.props;
 
-  componentDidUpdate() {
-    ReactTooltip.rebuild();
-  }
-
-  countColorPalette = () => {
-    const { FillColor, StrokeColor, TextColor } = this.props.style;
-
-    return [FillColor, StrokeColor, TextColor].reduce((numberOfPalette, colorProperty) => {
-      if (colorProperty) {
-        numberOfPalette += 1;
-      }
-      return numberOfPalette;
-    }, 0);
+    setColorPalette(colorMapKey, newPalette);
   }
 
   renderTextColorIcon = () => {
-    const { style: { TextColor }, colorPalette, onHeaderChange, t } = this.props;
-    
-    if (!TextColor) {
-      return null;
-    }
+    const { style: { TextColor }, colorPalette } = this.props;
 
     return (
-      <div
-        className={colorPalette === 'text' ? 'text selected' : 'text'}
-        style={{ color: TextColor.toHexString() }}
-        onClick={() => onHeaderChange('text')}
-        data-tip={t('option.annotationColor.text')}
-      >
-        Aa
-      </div>
+      <Tooltip content="option.annotationColor.TextColor">
+        <div
+          className={colorPalette === 'TextColor' ? 'text selected' : 'text'}
+          style={{ color: TextColor.toHexString() }}
+          onClick={() => this.setColorPalette('TextColor')}
+        >
+          Aa
+        </div>
+      </Tooltip>
     );
   }
 
   renderBorderColorIcon = () => {
-    const { style: { StrokeColor }, colorPalette, onHeaderChange, t } = this.props;
-    
-    if (!StrokeColor) {
-      return null;
-    }
+    const { style: { StrokeColor }, colorPalette } = this.props;
 
     const renderInnerCircle = () => {
       const borderColor = getBrightness(StrokeColor) === 'dark' ? '#bfbfbf' : 'none';
 
-      return(
+      return (
         <svg height="100%" width="100%">
           <circle
             cx="50%"
@@ -78,55 +63,52 @@ class ColorPaletteHeader extends React.PureComponent {
     };
 
     return (
-      <div
-        className={colorPalette === 'border' ? 'border selected' : 'border'}
-        onClick={() => onHeaderChange('border')}
-        data-tip={t('option.annotationColor.border')}
-      >
+      <Tooltip content="option.annotationColor.StrokeColor">
         <div
-          className={`border-icon ${getBrightness(StrokeColor)}}`}
-          style={{ backgroundColor: StrokeColor.toHexString() }}
+          className={colorPalette === 'StrokeColor' ? 'border selected' : 'border'}
+          onClick={() => this.setColorPalette('StrokeColor')}
         >
-          {renderInnerCircle()}
+          <div
+            className={`border-icon ${getBrightness(StrokeColor)}}`}
+            style={{ backgroundColor: StrokeColor.toHexString() }}
+          >
+            {renderInnerCircle()}
+          </div>
         </div>
-      </div>
+      </Tooltip>
     );
   }
 
   renderFillColorIcon = () => {
-    const { style: { FillColor }, colorPalette, onHeaderChange, t } = this.props;
-
-    if (!FillColor) {
-      return null;
-    }
-
+    const { style: { FillColor }, colorPalette } = this.props;
     const isTransparency = FillColor.toHexString() === null;
 
-    return(
-      <div
-        className={colorPalette === 'fill' ? 'fill selected' : 'fill'}
-        onClick={() => onHeaderChange('fill')}
-        data-tip={t('option.annotationColor.fill')}
-      >
+    return (
+      <Tooltip content="option.annotationColor.FillColor">
         <div
-          className={`fill-icon ${getBrightness(FillColor)} ${isTransparency ? 'transparency' : ''}`}
-          style={{ backgroundColor: FillColor.toHexString() }}
+          className={colorPalette === 'FillColor' ? 'fill selected' : 'fill'}
+          onClick={() => this.setColorPalette('FillColor')}
         >
-          {isTransparency &&
-            <svg width="100%" height="100%">
-              <line x1="0%" y1="100%" x2="100%" y2="0%" strokeWidth="1" stroke="#e44234" strokeLinecap="square" />
-            </svg>
-          }
+          <div
+            className={`fill-icon ${getBrightness(FillColor)} ${isTransparency ? 'transparency' : ''}`}
+            style={{ backgroundColor: FillColor.toHexString() }}
+          >
+            {isTransparency &&
+              <svg width="100%" height="100%">
+                <line x1="0%" y1="100%" x2="100%" y2="0%" strokeWidth="1" stroke="#e44234" strokeLinecap="square" />
+              </svg>
+            }
+          </div>
         </div>
-      </div>
+      </Tooltip>
     );
   }
 
   render() {
-    const { t, colorPalette } = this.props;
-    const numberOfPalette = this.countColorPalette();
+    const { t, colorPalette, colorMapKey } = this.props;
+    const { availablePalettes } = getDataWithKey(colorMapKey);
 
-    if (numberOfPalette < 2) {
+    if (availablePalettes.length < 2) {
       return null;
     }
 
@@ -136,13 +118,23 @@ class ColorPaletteHeader extends React.PureComponent {
           {t(`option.annotationColor.${colorPalette}`)}
         </div>
         <div className="palette">
-          {this.renderTextColorIcon()}
-          {this.renderBorderColorIcon()}
-          {this.renderFillColorIcon()}
+          {availablePalettes.includes('TextColor') &&
+            this.renderTextColorIcon()
+          }
+          {availablePalettes.includes('StrokeColor') &&
+            this.renderBorderColorIcon()
+          }
+          {availablePalettes.includes('FillColor') &&
+            this.renderFillColorIcon()
+          }
         </div>
       </div>
     );
   }
 }
 
-export default translate(null, { wait: false })(ColorPaletteHeader);
+const mapDispatchToProps = {
+  setColorPalette: actions.setColorPalette,
+};
+
+export default connect(null, mapDispatchToProps)(withTranslation(null, { wait: false })(ColorPaletteHeader));

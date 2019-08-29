@@ -6,8 +6,9 @@ import core from 'core';
 import { isIE } from 'helpers/device';
 import { updateContainerWidth, getClassNameInIE, handleWindowResize } from 'helpers/documentContainerHelper';
 import loadDocument from 'helpers/loadDocument';
+import getNumberOfPagesToNavigate from 'helpers/getNumberOfPagesToNavigate';
 import TouchEventManager from 'helpers/TouchEventManager';
-import { ZOOM_MIN, ZOOM_MAX } from 'constants/zoomFactors';
+import { getMinZoomLevel, getMaxZoomLevel } from 'constants/zoomFactors';
 import actions from 'actions';
 import selectors from 'selectors';
 
@@ -28,14 +29,15 @@ class DocumentContainer extends React.PureComponent {
     isHeaderOpen: PropTypes.bool,
     dispatch: PropTypes.func.isRequired,
     openElement: PropTypes.func.isRequired,
-    displayMode: PropTypes.string.isRequired
+    closeElements: PropTypes.func.isRequired,
+    displayMode: PropTypes.string.isRequired,
+    leftPanelWidth: PropTypes.number,
   }
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.document = React.createRef();
     this.container = React.createRef();
-    this.touchEventManager = Object.create(TouchEventManager);
     this.wheelToNavigatePages = _.throttle(this.wheelToNavigatePages.bind(this), 300, { trailing: false });
     this.wheelToZoom = _.throttle(this.wheelToZoom.bind(this), 30, { trailing: false });
   }
@@ -47,25 +49,43 @@ class DocumentContainer extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.touchEventManager.initialize(this.document.current, this.container.current);
+    TouchEventManager.initialize(this.document.current, this.container.current);
     core.setScrollViewElement(this.container.current);
     core.setViewerElement(this.document.current);
 
-    const { hasPath, doesDocumentAutoLoad, openElement, document, advanced, dispatch } = this.props;
-    if (hasPath && doesDocumentAutoLoad) {
-      openElement('loadingModal');
+    const { hasPath, doesDocumentAutoLoad, document, advanced, dispatch } = this.props;
+    if ((hasPath && doesDocumentAutoLoad) || document.isOffline) {
       loadDocument({ document, advanced }, dispatch);
     }
 
     if (isIE) {
       window.addEventListener('resize', this.handleWindowResize);
     }
+
+    this.container.current.addEventListener('wheel', this.onWheel, { passive: false });
+    window.addEventListener('keydown', this.onKeyDown);
   }
 
   componentWillUnmount() {
-    this.touchEventManager.terminate();
+    TouchEventManager.terminate();
     if (isIE) {
       window.removeEventListener('resize', this.handleWindowResize);
+    }
+
+    this.container.current.removeEventListener('wheel', this.onWheel, { passive: false });
+    window.removeEventListener('keydown', this.onKeyDown);
+  }
+
+  onKeyDown = e => {
+    const { currentPage, totalPages } = this.props;
+    const { scrollTop, clientHeight, scrollHeight } = this.container.current;
+    const reachedTop = scrollTop === 0;
+    const reachedBottom = Math.abs(scrollTop + clientHeight - scrollHeight) <= 1;
+
+    if ((e.key === 'ArrowUp' || e.which === 38) && reachedTop && currentPage > 1) {
+      this.pageUp();
+    } else if ((e.key === 'ArrowDown' || e.which === 40) && reachedBottom && currentPage < totalPages) {
+      this.pageDown();
     }
   }
 
@@ -73,11 +93,11 @@ class DocumentContainer extends React.PureComponent {
     handleWindowResize(this.props, this.container.current);
   }
 
-  onWheel = e => {    
+  onWheel = e => {
     if (e.metaKey || e.ctrlKey) {
       e.preventDefault();
       this.wheelToZoom(e);
-    } else if (!core.isContinuousDisplayMode()){
+    } else if (!core.isContinuousDisplayMode()) {
       this.wheelToNavigatePages(e);
     }
   }
@@ -86,39 +106,29 @@ class DocumentContainer extends React.PureComponent {
     const { currentPage, totalPages } = this.props;
     const { scrollTop, scrollHeight, clientHeight } = this.container.current;
     const reachedTop = scrollTop === 0;
-    // we have 1 instead of just checking scrollTop + clientHeight === scrollHeight is because
-    // for some screens it has ~1 pixels off
     const reachedBottom = Math.abs(scrollTop + clientHeight - scrollHeight) <= 1;
 
     if (e.deltaY < 0 && reachedTop && currentPage > 1) {
-      this.navigatePagesUp();
+      this.pageUp();
     } else if (e.deltaY > 0 && reachedBottom && currentPage < totalPages) {
-      this.navigatePagesDown();
+      this.pageDown();
     }
   }
 
-  navigatePagesUp = () => {
+  pageUp = () => {
+    const { currentPage, displayMode } = this.props;
     const { scrollHeight, clientHeight } = this.container.current;
-    const newPage = this.props.currentPage - this.getNumberOfPagesToNavigate();
+    const newPage = currentPage - getNumberOfPagesToNavigate(displayMode);
 
     core.setCurrentPage(Math.max(newPage, 1));
-    this.container.current.scrollTop = scrollHeight - clientHeight;    
+    this.container.current.scrollTop = scrollHeight - clientHeight;
   }
 
-  navigatePagesDown = () => {
-    const newPage = this.props.currentPage + this.getNumberOfPagesToNavigate();
+  pageDown = () => {
+    const { currentPage, displayMode, totalPages } = this.props;
+    const newPage = currentPage + getNumberOfPagesToNavigate(displayMode);
 
-    core.setCurrentPage(Math.min(newPage, this.props.totalPages));
-  }
-
-  getNumberOfPagesToNavigate = () => {
-    const mapDisplayModeToNumberOfPages = {
-      Single: 1,
-      Facing: 2,
-      CoverFacing: 2,
-    };
-
-    return mapDisplayModeToNumberOfPages[this.props.displayMode];
+    core.setCurrentPage(Math.min(newPage, totalPages));
   }
 
   wheelToZoom = e => {
@@ -128,10 +138,10 @@ class DocumentContainer extends React.PureComponent {
 
     if (e.deltaY < 0) {
       multiple = 1.25;
-      newZoomFactor = Math.min(currentZoomFactor * multiple, ZOOM_MAX);
+      newZoomFactor = Math.min(currentZoomFactor * multiple, getMaxZoomLevel());
     } else if (e.deltaY > 0) {
       multiple = 0.8;
-      newZoomFactor = Math.max(currentZoomFactor * multiple, ZOOM_MIN);
+      newZoomFactor = Math.max(currentZoomFactor * multiple, getMinZoomLevel());
     }
 
     core.zoomToMouse(newZoomFactor);
@@ -141,15 +151,23 @@ class DocumentContainer extends React.PureComponent {
     core.scrollViewUpdated();
   }
 
+  handleScroll = () => {
+    this.props.closeElements([
+      'annotationPopup',
+      'contextMenuPopup',
+      'textPopup',
+    ]);
+  }
+
   getClassName = props => {
     const { isLeftPanelOpen, isRightPanelOpen, isHeaderOpen, isSearchOverlayOpen } = props;
-    
+
     return [
       'DocumentContainer',
       isLeftPanelOpen ? 'left-panel' : '',
       isRightPanelOpen ? 'right-panel' : '',
       isHeaderOpen ? '' : 'no-header',
-      isSearchOverlayOpen ? 'search-overlay' : ''
+      isSearchOverlayOpen ? 'search-overlay' : '',
     ].join(' ').trim();
   }
 
@@ -157,13 +175,13 @@ class DocumentContainer extends React.PureComponent {
     let className;
 
     if (isIE) {
-      className = getClassNameInIE(this.props);  
+      className = getClassNameInIE(this.props);
     } else {
       className = this.getClassName(this.props);
     }
 
-    return(
-      <div className={className} ref={this.container} data-element="documentContainer" onWheel={this.onWheel} onTransitionEnd={this.onTransitionEnd}>
+    return (
+      <div className={className} ref={this.container} data-element="documentContainer" onScroll={this.handleScroll} onTransitionEnd={this.onTransitionEnd}>
         <div className="document" ref={this.document}></div>
       </div>
     );
@@ -182,12 +200,15 @@ const mapStateToProps = state => ({
   currentPage: selectors.getCurrentPage(state),
   isHeaderOpen: selectors.isElementOpen(state, 'header') && !selectors.isElementDisabled(state, 'header'),
   displayMode: selectors.getDisplayMode(state),
-  totalPages: selectors.getTotalPages(state)
+  totalPages: selectors.getTotalPages(state),
+  // using leftPanelWidth to trigger render
+  leftPanelWidth: selectors.getLeftPanelWidth(state),
 });
 
 const mapDispatchToProps = dispatch => ({
   dispatch,
-  openElement: dataElement => dispatch(actions.openElement(dataElement)) 
+  openElement: dataElement => dispatch(actions.openElement(dataElement)),
+  closeElements: dataElements => dispatch(actions.closeElements(dataElements)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DocumentContainer);

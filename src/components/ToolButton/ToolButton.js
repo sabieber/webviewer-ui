@@ -1,97 +1,73 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import classNames from 'classnames';
+import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 
 import Button from 'components/Button';
 
 import core from 'core';
-import toolStyleExists from 'helpers/toolStyleExists';
-import getToolStyle from 'helpers/getToolStyle';
-import getColorFromStyle from 'helpers/getColorFromStyle';
+import toolStylesExist from 'helpers/toolStylesExist';
+import getToolStyles from 'helpers/getToolStyles';
+import { mapToolNameToKey } from 'constants/map';
 import actions from 'actions';
 import selectors from 'selectors';
 
 import './ToolButton.scss';
 
-class ToolButton extends React.PureComponent {
-  static propTypes = {
-    isElementDisabled: PropTypes.bool,
-    isToolDisabled: PropTypes.bool,
-    isActive: PropTypes.bool.isRequired,
-    activeToolStyles: PropTypes.object.isRequired,
-    toolName: PropTypes.string.isRequired,
-    group: PropTypes.string,
-    showColor: PropTypes.string.isRequired,
-    toggleElement: PropTypes.func.isRequired,
-    closeElement: PropTypes.func.isRequired,
-    setActiveToolGroup: PropTypes.func.isRequired
-  }
+const propTypes = {
+  toolName: PropTypes.string.isRequired,
+  group: PropTypes.string,
+};
 
-  onClick = e => {
-    const { isActive, toolName, group = '', setActiveToolGroup, closeElement, toggleElement } = this.props;
+const ToolButton = ({ toolName, ...restProps }) => {
+  const [
+    isActive,
+    iconColor,
+    { group = '', showColor, ...restObjectData },
+  ] = useSelector(
+    state => [
+      selectors.getActiveToolName(state) === toolName,
+      selectors.getIconColor(state, mapToolNameToKey(toolName)),
+      selectors.getToolButtonObject(state, toolName),
+    ],
+    shallowEqual,
+  );
+  const dispatch = useDispatch();
 
-    e.stopPropagation();
-
+  const handleClick = () => {
     if (isActive) {
-      if (toolStyleExists(toolName)) {
-        toggleElement('toolStylePopup');
+      if (toolStylesExist(toolName)) {
+        dispatch(actions.toggleElement('toolStylePopup'));
       }
     } else {
       core.setToolMode(toolName);
-      setActiveToolGroup(group);
-      closeElement('toolStylePopup');
+      dispatch(actions.setActiveToolGroup(group));
+      dispatch(actions.closeElement('toolStylePopup'));
     }
+  };
+
+  const toolStyles = getToolStyles(toolName);
+  let color = '';
+
+  if (showColor === 'always' || (showColor === 'active' && isActive)) {
+    color = toolStyles[iconColor]?.toHexString?.();
   }
 
-  getToolButtonColor = () => {
-    const { showColor, activeToolStyles, isActive, toolName } = this.props;
-
-    switch (showColor) {
-      case 'always': {
-        const toolStyle = getToolStyle(toolName);
-        return getColorFromStyle(toolStyle);
-      }
-      case 'active': {
-        const toolStyle = activeToolStyles;
-        return isActive ? getColorFromStyle(toolStyle) : '';
-      }
-      case 'never': 
-      default: {
-        return '';
-      }
-    }
-  }
-
-  render() {
-    const { isElementDisabled, isToolDisabled, toolName } = this.props;
-    const color = this.getToolButtonColor();
-    const className = [
-      'ToolButton',
-      toolStyleExists(toolName) ? 'hasStyles' : ''
-    ].join(' ').trim();
-
-    if (isElementDisabled || isToolDisabled) {
-      return null;
-    }
-
-    return (
-      <Button {...this.props} className={className} color={color} onClick={this.onClick} />
-    );
-  }
-}
-
-const mapStateToProps = (state, ownProps) => ({
-  isElementDisabled: selectors.isElementDisabled(state, selectors.getToolButtonObject(state, ownProps.toolName).dataElement),
-  isActive: selectors.getActiveToolName(state) === ownProps.toolName,
-  isToolDisabled: selectors.isToolDisabled(state, ownProps.toolName),
-  activeToolStyles: selectors.getActiveToolStyles(state),
-  ...selectors.getToolButtonObject(state, ownProps.toolName)
-});
-
-const mapDispatchToProps = {
-  toggleElement: actions.toggleElement,
-  closeElement: actions.closeElement,
-  setActiveToolGroup: actions.setActiveToolGroup
+  return core.getTool(toolName)?.disabled ? null : (
+    <Button
+      className={classNames({
+        ToolButton: true,
+        hasStyles: toolStylesExist(toolName),
+      })}
+      onClick={handleClick}
+      isActive={isActive}
+      color={color}
+      {...restProps}
+      {...restObjectData}
+    />
+  );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ToolButton);
+ToolButton.propTypes = propTypes;
+
+export default ToolButton;

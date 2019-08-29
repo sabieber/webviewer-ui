@@ -1,6 +1,7 @@
 import core from 'core';
 import getHashParams from 'helpers/getHashParams';
 import getAnnotationRelatedElements from 'helpers/getAnnotationRelatedElements';
+import { isMobileDevice } from 'helpers/device';
 import { PRIORITY_THREE, PRIORITY_ONE } from 'constants/actionPriority';
 import actions from 'actions';
 
@@ -14,6 +15,10 @@ export default store => {
   disableElementsIfFilePickerDisabled(dispatch);
   disableElementsIfHideAnnotationPanel(dispatch);
   disableElementsIfToolBarDisabled(dispatch);
+  disableElementsIfMeasurementsDisabled(dispatch);
+  disableElementsIfRedactionsDisabled(dispatch);
+  disableElementsIfDesktop(dispatch);
+  disableElementsIfMobile(dispatch);
 };
 
 const disableElementsPassedByConstructor = (state, dispatch) => {
@@ -27,12 +32,11 @@ const disableElementsIfReadOnly = (state, dispatch) => {
   if (state.viewer.isReadOnly) {
     const elements = [
       'annotationPopup',
-      ...getAnnotationRelatedElements(state)
+      ...getAnnotationRelatedElements(state),
     ];
 
     dispatch(actions.disableElements(elements, PRIORITY_ONE));
-    core.setToolMode('AnnotationEdit');
-  }  
+  }
 };
 
 const disableElementsIfAnnotationDisabled = (state, dispatch) => {
@@ -42,8 +46,8 @@ const disableElementsIfAnnotationDisabled = (state, dispatch) => {
       'notesPanel',
       'notesPanelButton',
       ...getAnnotationRelatedElements(state),
-    ];  
-  
+    ];
+
     dispatch(actions.disableElements(elements, PRIORITY_ONE));
   }
 };
@@ -55,8 +59,8 @@ const disableElementsIfFilePickerDisabled = dispatch => {
     const elements = [
       'filePickerHandler',
       'filePickerButton',
-    ];  
-  
+    ];
+
     dispatch(actions.disableElements(elements, PRIORITY_ONE));
   }
 };
@@ -68,9 +72,9 @@ const disableElementsIfHideAnnotationPanel = dispatch => {
     const elements = [
       'notesPanel',
       'notesPanelButton',
-      'annotationCommentButton'
-    ];  
-  
+      'annotationCommentButton',
+    ];
+
     dispatch(actions.disableElements(elements, PRIORITY_ONE));
   }
 };
@@ -80,5 +84,34 @@ const disableElementsIfToolBarDisabled = dispatch => {
 
   if (toolBarDisabled) {
     dispatch(actions.disableElement('header', PRIORITY_ONE));
+  }
+};
+
+const disableElementsIfMeasurementsDisabled = dispatch => {
+  const measurementsDisabled = !getHashParams('enableMeasurement', false);
+  if (measurementsDisabled) {
+    dispatch(actions.disableElements(['measurementToolGroupButton', 'measurementOverlay'], PRIORITY_ONE));
+  }
+};
+
+const disableElementsIfRedactionsDisabled = dispatch => {
+  const redactionsDisabled = !(getHashParams('enableRedaction', false) || core.isCreateRedactionEnabled());
+  if (redactionsDisabled) {
+    dispatch(actions.disableElement('redactionButton', PRIORITY_ONE));
+  }
+};
+
+const disableElementsIfDesktop = dispatch => {
+  // we could have used the 'hidden' property in the initialState.js to hide this button by css,
+  // but that actually checks the window.innerWidth to hide the button, not based on the actual device.
+  // we could potentially improve the 'hidden' property in the future.
+  if (!isMobileDevice) {
+    dispatch(actions.disableElement('textSelectButton', PRIORITY_THREE));
+  }
+};
+
+const disableElementsIfMobile = dispatch => {
+  if (isMobileDevice) {
+    dispatch(actions.disableElement('marqueeToolButton', PRIORITY_THREE));
   }
 };

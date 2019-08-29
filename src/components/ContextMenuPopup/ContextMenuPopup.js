@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import onClickOutside from 'react-onclickoutside';
+
 import ActionButton from 'components/ActionButton';
 
 import getClassName from 'helpers/getClassName';
@@ -18,7 +20,7 @@ class ContextMenuPopup extends React.PureComponent {
     dispatch: PropTypes.func.isRequired,
     openElement: PropTypes.func.isRequired,
     closeElement: PropTypes.func.isRequired,
-    closeElements: PropTypes.func.isRequired
+    closeElements: PropTypes.func.isRequired,
   }
 
   constructor() {
@@ -26,7 +28,7 @@ class ContextMenuPopup extends React.PureComponent {
     this.popup = React.createRef();
     this.state = {
       left: 0,
-      top: 0
+      top: 0,
     };
   }
 
@@ -36,7 +38,7 @@ class ContextMenuPopup extends React.PureComponent {
 
   componentDidUpdate(prevProps) {
     if (!prevProps.isOpen && this.props.isOpen) {
-      this.props.closeElements([ 'annotationPopup', 'textPopup' ]);
+      this.props.closeElements(['annotationPopup', 'textPopup']);
     }
   }
 
@@ -45,12 +47,21 @@ class ContextMenuPopup extends React.PureComponent {
   }
 
   onContextMenu = e => {
-    e.preventDefault();
+    const { tagName } = e.target;
+    const clickedOnInput = tagName === 'INPUT';
+    const clickedOnTextarea = tagName === 'TEXTAREA';
+    const clickedOnDocumentContainer = document.querySelector('.DocumentContainer').contains(e.target);
 
-    const { left, top } = this.getPopupPosition(e);
+    if (clickedOnDocumentContainer && !(clickedOnInput || clickedOnTextarea)) {
+      e.preventDefault();
 
-    this.setState({ left, top });
-    this.props.openElement('contextMenuPopup');
+      const { left, top } = this.getPopupPosition(e);
+
+      this.setState({ left, top });
+      this.props.openElement('contextMenuPopup');
+    } else {
+      this.props.closeElement('contextMenuPopup');
+    }
   }
 
   getPopupPosition = e => {
@@ -81,6 +92,10 @@ class ContextMenuPopup extends React.PureComponent {
     return { left, top };
   }
 
+  handleClickOutside = () => {
+    this.props.closeElement('contextMenuPopup');
+  }
+
   handleClick = (toolName, group = '') => {
     const { dispatch, closeElement } = this.props;
     setToolModeAndGroup(dispatch, toolName, group);
@@ -90,24 +105,24 @@ class ContextMenuPopup extends React.PureComponent {
 
   render() {
     const { isDisabled, isAnnotationToolsEnabled } = this.props;
-   
-    if (isDisabled) { 
+
+    if (isDisabled) {
       return null;
     }
-   
+
     const { left, top } = this.state;
     const className = getClassName('Popup ContextMenuPopup', this.props);
 
     return (
-      <div className={className} ref={this.popup} data-element={'contextMenuPopup'} style={{ left, top }} onMouseDown={e => e.stopPropagation()}>
+      <div className={className} ref={this.popup} data-element={'contextMenuPopup'} style={{ left, top }}>
         <ActionButton dataElement="panToolButton" title="tool.pan" img="ic_pan_black_24px" onClick={() => this.handleClick('Pan')} />
         {isAnnotationToolsEnabled &&
-          <React.Fragment>
+          <>
             <ActionButton dataElement="stickyToolButton" title="annotation.stickyNote" img="ic_annotation_sticky_note_black_24px" onClick={() => this.handleClick('AnnotationCreateSticky')} />
             <ActionButton dataElement="highlightToolButton" title="annotation.highlight" img="ic_annotation_highlight_black_24px" onClick={() => this.handleClick('AnnotationCreateTextHighlight', 'textTools')} />
             <ActionButton dataElement="freeHandToolButton" title="annotation.freehand" img="ic_annotation_freehand_black_24px" onClick={() => this.handleClick('AnnotationCreateFreeHand', 'freeHandTools')} />
             <ActionButton dataElement="freeTextToolButton" title="annotation.freetext" img="ic_annotation_freetext_black_24px" onClick={() => this.handleClick('AnnotationCreateFreeText')} />
-          </React.Fragment>
+          </>
         }
       </div>
     );
@@ -117,14 +132,14 @@ class ContextMenuPopup extends React.PureComponent {
 const mapStateToProps = state => ({
   isAnnotationToolsEnabled: !selectors.isElementDisabled(state, 'annotations') && !selectors.isDocumentReadOnly(state),
   isOpen: selectors.isElementOpen(state, 'contextMenuPopup'),
-  isDisabled: selectors.isElementDisabled(state, 'contextMenuPopup')
+  isDisabled: selectors.isElementDisabled(state, 'contextMenuPopup'),
 });
 
 const mapDispatchToProps = dispatch => ({
   dispatch,
   openElement: dataElement => dispatch(actions.openElement(dataElement)),
   closeElement: dataElement => dispatch(actions.closeElement(dataElement)),
-  closeElements: dataElements => dispatch(actions.closeElements(dataElements))
+  closeElements: dataElements => dispatch(actions.closeElements(dataElements)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ContextMenuPopup);
+export default connect(mapStateToProps, mapDispatchToProps)(onClickOutside(ContextMenuPopup));

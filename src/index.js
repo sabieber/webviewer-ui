@@ -1,28 +1,32 @@
+// import { hot } from 'react-hot-loader';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import { I18nextProvider } from 'react-i18next';
-import i18n from 'i18next';
+import i18next from 'i18next';
 import thunk from 'redux-thunk';
 
-import apis from 'src/apis';
+import core from 'core';
+import actions from 'actions';
 import App from 'components/App';
-import rootReducer from 'reducers/rootReducer';
-import { engineTypes } from 'constants/types';
-import LayoutMode from 'constants/layoutMode';
-import FitMode from 'constants/fitMode';
+import { workerTypes } from 'constants/types';
+import defaultTool from 'constants/defaultTool';
 import getBackendPromise from 'helpers/getBackendPromise';
 import loadCustomCSS from 'helpers/loadCustomCSS';
-import loadScript from 'helpers/loadScript';
+import loadScript, { loadConfig } from 'helpers/loadScript';
 import setupLoadAnnotationsFromServer from 'helpers/setupLoadAnnotationsFromServer';
+import setupMIMETypeTest from 'helpers/setupMIMETypeTest';
 import eventHandler from 'helpers/eventHandler';
 import setupPDFTron from 'helpers/setupPDFTron';
 import setupI18n from 'helpers/setupI18n';
+import setAutoSwitch from 'helpers/setAutoSwitch';
 import setDefaultDisabledElements from 'helpers/setDefaultDisabledElements';
 import setupDocViewer from 'helpers/setupDocViewer';
-import setDefaultToolColor from 'helpers/setDefaultToolColor';
+import setDefaultToolStyles from 'helpers/setDefaultToolStyles';
 import setUserPermission from 'helpers/setUserPermission';
+import logDebugInfo from 'helpers/logDebugInfo';
+import rootReducer from 'reducers/rootReducer';
 
 const middleware = [thunk];
 
@@ -32,6 +36,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 const store = createStore(rootReducer, applyMiddleware(...middleware));
+
 
 if (process.env.NODE_ENV === 'development' && module.hot) {
   module.hot.accept('reducers/rootReducer', () => {
@@ -63,7 +68,7 @@ if (window.CanvasRenderingContext2D) {
 
   try {
     if (state.advanced.useSharedWorker && window.parent.WebViewer) {
-      var workerTransportPromise = window.parent.WebViewer.workerTransportPromise();
+      var workerTransportPromise = window.parent.WebViewer.workerTransportPromise(window.frameElement);
       // originally the option was just for the pdf worker transport promise, now it can be an object
       // containing both the pdf and office promises
       if (workerTransportPromise.pdf || workerTransportPromise.office) {
@@ -79,131 +84,58 @@ if (window.CanvasRenderingContext2D) {
     }
   }
 
-  if (state.advanced.preloadWorker && state.advanced.engineType === engineTypes.PDFNETJS) {
-    if (state.document.pdfType !== 'wait') {
+  const { preloadWorker } = state.advanced;
+  const { PDF, OFFICE, ALL } = workerTypes;
+
+  if (preloadWorker) {
+    if (preloadWorker === PDF || preloadWorker === ALL) {
       getBackendPromise(state.document.pdfType).then(pdfType => {
-        window.CoreControls.preloadPDFWorker(pdfType, {}, {});
+        window.CoreControls.initPDFWorkerTransports(pdfType, {
+          workerLoadingProgress: percent => {
+            store.dispatch(actions.setWorkerLoadingProgress(percent));
+          },
+        }, window.sampleL);
       });
     }
 
-    if (state.document.officeType !== 'wait') {
+    if (preloadWorker === OFFICE || preloadWorker === ALL) {
       getBackendPromise(state.document.officeType).then(officeType => {
-        window.CoreControls.preloadOfficeWorker(officeType, {}, {});
+        window.CoreControls.initOfficeWorkerTransports(officeType, {
+          workerLoadingProgress: percent => {
+            store.dispatch(actions.setWorkerLoadingProgress(percent));
+          },
+        }, window.sampleL);
       });
     }
   }
 
   loadCustomCSS(state.advanced.customCSS);
 
-  fullAPIReady.then(() => {
-    return loadScript(state.advanced.configScript, 'Config script could not be loaded. The default configuration will be used.');
-  }).then(() => {
+  logDebugInfo(state.advanced);
+
+  fullAPIReady.then(() => loadConfig()).then(() => {
     const { addEventHandlers, removeEventHandlers } = eventHandler(store);
     const docViewer = new window.CoreControls.DocumentViewer();
     window.docViewer = docViewer;
     setupPDFTron();
     setupDocViewer();
     setupI18n(state);
-    setDefaultToolColor();
+    setupMIMETypeTest(store);
     setUserPermission(state);
-    addEventHandlers(),
-    setDefaultDisabledElements(store),
+    setAutoSwitch();
+    setDefaultDisabledElements(store);
     setupLoadAnnotationsFromServer(store);
+    addEventHandlers();
+    setDefaultToolStyles();
+    core.setToolMode(defaultTool);
 
     ReactDOM.render(
       <Provider store={store}>
-        <I18nextProvider i18n={i18n}>
+        <I18nextProvider i18n={i18next}>
           <App removeEventHandlers={removeEventHandlers} />
         </I18nextProvider>
       </Provider>,
       document.getElementById('app'),
-      () => {
-        window.readerControl = {
-          ...apis.getActions(store),
-          FitMode,
-          LayoutMode,
-          addSearchListener: apis.addSearchListener(store),
-          closeDocument: apis.closeDocument(store),
-          constants: apis.getConstants(),
-          disableTool: apis.disableTool(store),
-          disableTools: apis.disableTools(store),
-          docViewer,
-          downloadPdf: apis.downloadPdf(store),
-          enableAnnotations: apis.enableAnnotations(store),
-          enableDownload: apis.enableDownload(store),
-          enableFilePicker: apis.enableFilePicker(store),
-          enableNotesPanel: apis.enableNotesPanel(store),
-          enablePrint: apis.enablePrint(store),
-          enableTextSelection: apis.enableTextSelection(store),
-          enableTool: apis.enableTool(store),
-          enableTools: apis.enableTools(store),
-          getAnnotationUser: apis.getAnnotationUser,
-          getBBAnnotManager: apis.getBBAnnotManager(store),
-          getCurrentPageNumber: apis.getCurrentPageNumber(store),
-          getFitMode: apis.getFitMode(store),
-          getLayoutMode: apis.getLayoutMode(store),
-          getPageCount: apis.getPageCount(store),
-          getShowSideWindow: apis.getShowSideWindow(store),
-          getSideWindowVisibility: apis.getSideWindowVisibility(store),
-          getToolMode: apis.getToolMode,
-          getZoomLevel: apis.getZoomLevel(store),
-          goToFirstPage: apis.goToFirstPage,
-          goToLastPage: apis.goToLastPage(store),
-          goToNextPage: apis.goToNextPage(store),
-          goToPrevPage: apis.goToPrevPage(store),
-          i18n,
-          isAdminUser: apis.isAdminUser,
-          isElementOpen: apis.isElementOpen(store),
-          isElementDisabled: apis.isElementDisabled(store),
-          isMobileDevice: apis.isMobileDevice,
-          isReadOnly: apis.isReadOnly,
-          isToolDisabled: apis.isToolDisabled(store),
-          loadDocument: apis.loadDocument(store),
-          registerTool: apis.registerTool(store),
-          removeSearchListener: apis.removeSearchListener(store),
-          rotateClockwise: apis.rotateClockwise,
-          rotateCounterClockwise: apis.rotateCounterClockwise,
-          saveAnnotations: apis.saveAnnotations(store),
-          searchText: apis.searchText(store),
-          searchTextFull: apis.searchTextFull(store),
-          selectors: apis.getSelectors(store),
-          setAdminUser: apis.setAdminUser,
-          setNoteDateFormat: apis.setNoteDateFormat(store),
-          setNoteCustomContentRenderer: apis.setNoteCustomContentRenderer(store),
-          setAnnotationUser: apis.setAnnotationUser,
-          setTheme: apis.setTheme,
-          setCurrentPageNumber: apis.setCurrentPageNumber,
-          setEngineType: apis.setEngineType(store),
-          setFitMode: apis.setFitMode,
-          setHeaderItems: apis.setHeaderItems(store),
-          setLanguage: apis.setLanguage,
-          setLayoutMode: apis.setLayoutMode,
-          setNotesPanelSort: apis.setNotesPanelSort(store),
-          setPrintQuality: apis.setPrintQuality(store),
-          setReadOnly: apis.setReadOnly,
-          setShowSideWindow: apis.setShowSideWindow(store),
-          setSideWindowVisibility: apis.setSideWindowVisibility(store),
-          setThumbnailCustomContentRenderer: apis.setThumbnailCustomContentRenderer(store),
-          setToolMode: apis.setToolMode(store),
-          setZoomLevel: apis.setZoomLevel,
-          toggleFullScreen: apis.toggleFullScreen,
-          unregisterTool: apis.unregisterTool(store),
-          updateOutlines: apis.updateOutlines(store),
-          loadedFromServer: false,
-          serverFailed: false
-        };
-
-        window.ControlUtils = {
-          byteRangeCheck: onComplete => {
-            onComplete(206);
-          },
-          getCustomData: () => {
-            return state.advanced.customData;
-          }
-        };
-
-        $(document).trigger('viewerLoaded');
-      }
     );
   });
 }

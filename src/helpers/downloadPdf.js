@@ -1,10 +1,12 @@
-import FileSaver from 'file-saver';
+import { saveAs } from 'file-saver';
 
 import core from 'core';
 import { isIE } from 'helpers/device';
 import actions from 'actions';
 
-export default (dispatch, documentPath = 'document', filename, includeAnnotations = true, xfdfData) => {
+export default (dispatch, options) => {
+  const { documentPath = 'document', filename, includeAnnotations = true, xfdfData, externalURL } = options;
+
   return new Promise(resolve => {
     const downloadOptions = { downloadType: 'pdf' };
     let file;
@@ -30,12 +32,14 @@ export default (dispatch, documentPath = 'document', filename, includeAnnotation
       const downloadName = getDownloadFilename(name, '.pdf');
 
       const doc = core.getDocument();
-      const bbURLPromise = doc.getDownloadLink({ filename: downloadName });
+      const bbURLPromise = externalURL ? Promise.resolve({ url: externalURL }) : doc.getDownloadLink({ filename: downloadName });
+
       if (bbURLPromise) {
         const downloadIframe = document.getElementById('download-iframe') || document.createElement('iframe');
         downloadIframe.width = 0;
         downloadIframe.height = 0;
         downloadIframe.id = 'download-iframe';
+        downloadIframe.src = null;
         document.body.appendChild(downloadIframe);
         bbURLPromise.then(result => {
           downloadIframe.src = result.url;
@@ -50,7 +54,8 @@ export default (dispatch, documentPath = 'document', filename, includeAnnotation
           } else {
             file = new File([arr], downloadName, { type: 'application/pdf' });
           }
-          FileSaver.saveAs(file, downloadName);
+
+          saveAs(file, downloadName);
           dispatch(actions.closeElement('loadingModal'));
           $(document).trigger('finishedSavingPDF');
           resolve();

@@ -12,12 +12,12 @@ class LoadingModal extends React.PureComponent {
   static propTypes = {
     isDisabled: PropTypes.bool,
     isOpen: PropTypes.bool,
-    closeElements: PropTypes.func.isRequired
+    closeElements: PropTypes.func.isRequired,
   }
 
   componentDidUpdate(prevProps) {
     if (!prevProps.isOpen && this.props.isOpen) {
-      this.props.closeElements([ 'signatureModal', 'printModal', 'errorModal' ]);
+      this.props.closeElements(['signatureModal', 'printModal', 'errorModal']);
     }
   }
 
@@ -40,11 +40,12 @@ class LoadingModal extends React.PureComponent {
 
 const mapStateToProps = state => ({
   isDisabled: selectors.isElementDisabled(state, 'loadingModal'),
-  isOpen: selectors.isElementOpen(state, 'loadingModal')
+  isOpen: selectors.isElementOpen(state, 'loadingModal'),
+  loadingProgress: selectors.getLoadingProgress(state),
 });
 
 const mapDispatchToProps = {
-  closeElements: actions.closeElements
+  closeElements: actions.closeElements,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoadingModal);

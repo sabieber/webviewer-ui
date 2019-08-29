@@ -1,13 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { translate } from 'react-i18next';
+import { withTranslation } from 'react-i18next';
 import { connect } from 'react-redux';
+import onClickOutside from 'react-onclickoutside';
 
 import Icon from 'components/Icon';
+import Tooltip from 'components/Tooltip';
 import Input from 'components/Input';
 
 import core from 'core';
 import getClassName from 'helpers/getClassName';
+import defaultTool from 'constants/defaultTool';
 import actions from 'actions';
 import selectors from 'selectors';
 
@@ -47,7 +50,7 @@ class SearchOverlay extends React.PureComponent {
     setNoResult: PropTypes.func.isRequired,
     setIsProgrammaticSearch: PropTypes.func.isRequired,
     setIsProgrammaticSearchFull: PropTypes.func.isRequired,
-    t: PropTypes.func.isRequired
+    t: PropTypes.func.isRequired,
   }
 
   constructor() {
@@ -62,14 +65,14 @@ class SearchOverlay extends React.PureComponent {
   componentDidUpdate(prevProps) {
     if (this.props.isProgrammaticSearch) {
       if (this.props.isSearchPanelOpen) {
-        this.props.closeElement('searchPanel');  
+        this.props.closeElement('searchPanel');
       }
       this.props.openElement('searchOverlay');
       this.clearSearchResults();
       this.executeSingleSearch();
       this.props.setIsProgrammaticSearch(false);
     } else if (this.props.isProgrammaticSearchFull) {
-      this.props.openElements([ 'searchOverlay', 'searchPanel' ]);
+      this.props.openElements(['searchOverlay', 'searchPanel']);
       this.caseSensitiveInput.current.checked = this.props.isCaseSensitive;
       this.wholeWordInput.current.checked = this.props.isWholeWord;
       this.clearSearchResults();
@@ -79,14 +82,24 @@ class SearchOverlay extends React.PureComponent {
 
     const searchOverlayOpened = !prevProps.isOpen && this.props.isOpen;
     if (searchOverlayOpened) {
-      this.props.closeElements([ 'toolsOverlay', 'viewControlsOverlay', 'menuOverlay', 'toolStylePopup' ]);
+      this.props.closeElements(['toolsOverlay', 'viewControlsOverlay', 'menuOverlay', 'toolStylePopup', 'signatureOverlay', 'zoomOverlay', 'redactionOverlay']);
       this.searchTextInput.current.focus();
+      core.setToolMode(defaultTool);
     }
-    
+
     const searchOverlayClosed = prevProps.isOpen && !this.props.isOpen;
     if (searchOverlayClosed) {
       this.props.closeElement('searchPanel');
       this.clearSearchResults();
+    }
+  }
+
+  handleClickOutside = e => {
+    const { closeElements, isSearchPanelOpen } = this.props;
+    const clickedSearchButton = e.target.getAttribute('data-element') === 'searchButton';
+
+    if (!isSearchPanelOpen && !clickedSearchButton) {
+      closeElements(['searchOverlay']);
     }
   }
 
@@ -105,7 +118,7 @@ class SearchOverlay extends React.PureComponent {
     const handleSearchResult = result => {
       const foundResult = result.resultCode === window.XODText.ResultCode.e_found;
       const isSearchDone = result.resultCode === window.XODText.ResultCode.e_done;
-      
+
       if (foundResult) {
         resultIndex++;
         noResult = false;
@@ -129,7 +142,7 @@ class SearchOverlay extends React.PureComponent {
   }
 
   getSearchMode = (isFull = false) => {
-    const { isCaseSensitive, isWholeWord, isWildcard, isRegex, isSearchUp, isAmbientString  } = this.props;
+    const { isCaseSensitive, isWholeWord, isWildcard, isRegex, isSearchUp, isAmbientString } = this.props;
     const { e_case_sensitive, e_whole_word, e_wild_card, e_regex, e_page_stop, e_highlight, e_search_up, e_ambient_string } = core.getSearchMode();
     let searchMode = e_page_stop | e_highlight;
 
@@ -163,7 +176,7 @@ class SearchOverlay extends React.PureComponent {
     }
 
     const inSamePage = activeResult.page_num === result.page_num;
-    const hasSameCoordinates = Object.values(activeResult.quads[0]).toString() === Object.values(result.quads[0]).toString(); 
+    const hasSameCoordinates = Object.values(activeResult.quads[0]).toString() === Object.values(result.quads[0]).toString();
 
     return inSamePage && hasSameCoordinates;
   }
@@ -176,7 +189,7 @@ class SearchOverlay extends React.PureComponent {
     const handleSearchResult = result => {
       const foundResult = result.resultCode === window.XODText.ResultCode.e_found;
       const isSearchDone = result.resultCode === window.XODText.ResultCode.e_done;
-      
+
       if (foundResult) {
         addResult(result);
         core.displaySearchResult(result);
@@ -184,15 +197,15 @@ class SearchOverlay extends React.PureComponent {
         this.runSearchListeners();
       }
       if (isSearchDone) {
-        readerControl.docViewer.trigger('endOfDocumentResult', true);
+        core.getDocumentViewer().trigger('endOfDocumentResult', true);
       }
       setIsSearching(false);
-    }; 
-    
+    };
+
     setIsSearching(true);
     core.textSearchInit(searchValue, searchMode, isFullSearch, handleSearchResult);
   }
-  
+
   runSearchListeners = () => {
     const { searchValue, searchListeners, isCaseSensitive, isWholeWord, isWildcard, isRegex, isAmbientString, isSearchUp, results } = this.props;
 
@@ -203,7 +216,7 @@ class SearchOverlay extends React.PureComponent {
         wildcard: isWildcard,
         regex: isRegex,
         searchUp: isSearchUp,
-        ambientString: isAmbientString
+        ambientString: isAmbientString,
       }, results);
     });
   }
@@ -214,10 +227,10 @@ class SearchOverlay extends React.PureComponent {
     }
   }
 
-  onInput = e => {
+  onChange = e => {
     const { isSearchPanelOpen, setSearchValue } = this.props;
     const searchValue = e.target.value;
-    
+
     setSearchValue(searchValue);
 
     if (searchValue.trim()) {
@@ -241,13 +254,13 @@ class SearchOverlay extends React.PureComponent {
       this.onClickOverflow(e);
     } else if (e.which === 13) { // Enter
       this.onClickNext(e);
-    } 
+    }
   }
 
   onClickNext = e => {
     e.preventDefault();
     const { isSearchPanelOpen, activeResultIndex, results, setActiveResultIndex } = this.props;
-    
+
     if (isSearchPanelOpen) {
       if (results.length === 0) {
         return;
@@ -268,7 +281,7 @@ class SearchOverlay extends React.PureComponent {
       if (results.length === 0) {
         return;
       }
-      const prevResultIndex = activeResultIndex === 0 ? results.length - 1  : activeResultIndex - 1; 
+      const prevResultIndex = activeResultIndex === 0 ? results.length - 1 : activeResultIndex - 1;
       setActiveResultIndex(prevResultIndex);
       core.setActiveSearchResult(results[prevResultIndex]);
     } else {
@@ -300,7 +313,7 @@ class SearchOverlay extends React.PureComponent {
 
   render() {
     const { isDisabled, t, isSearchPanelOpen, isSearchPanelDisabled, results, searchValue, activeResultIndex } = this.props;
-    
+
     if (isDisabled) {
       return null;
     }
@@ -308,11 +321,11 @@ class SearchOverlay extends React.PureComponent {
     const className = getClassName(`Overlay SearchOverlay ${isSearchPanelOpen ? 'transformed' : ''}`, this.props);
 
     return (
-      <div className={className} data-element="searchOverlay" onTransitionEnd={this.onTransitionEnd} onClick={e => e.stopPropagation()}>
+      <div className={className} data-element="searchOverlay" onTransitionEnd={this.onTransitionEnd}>
         <div className="wrapper">
           <div className="main">
             <div className="input-wrapper">
-              <input ref={this.searchTextInput} type="text" autoComplete="off" onInput={this.onInput} onKeyDown={this.onKeyDown} value={searchValue} />
+              <input ref={this.searchTextInput} type="text" autoComplete="off" onChange={this.onChange} onKeyDown={this.onKeyDown} value={searchValue} />
             </div>
             <div className="number-of-results">
               {isSearchPanelOpen &&
@@ -325,9 +338,11 @@ class SearchOverlay extends React.PureComponent {
             <div className="button next" onClick={this.onClickNext}>
               <Icon glyph="ic_chevron_right_black_24px" />
             </div>
-            <div data-tip={t('action.showMoreResults')} className={`advanced ${isSearchPanelOpen || isSearchPanelDisabled ? 'hidden' : ''}`} onClick={this.onClickOverflow}>
-              <Icon glyph="ic_overflow_black_24px" />
-            </div>
+            <Tooltip content="action.showMoreResults">
+              <div className={`advanced ${isSearchPanelOpen || isSearchPanelDisabled ? 'hidden' : ''}`} onClick={this.onClickOverflow}>
+                <Icon glyph="ic_overflow_black_24px" />
+              </div>
+            </Tooltip>
           </div>
           <div className={`options ${isSearchPanelOpen ? 'visible' : ''}`}>
             <Input id="case-sensitive-option" type="checkbox" ref={this.caseSensitiveInput} onChange={this.onChangeCaseSensitive} label={t('option.searchPanel.caseSensitive')} />
@@ -374,7 +389,7 @@ const mapDispatchToProps = {
   setWholeWord: actions.setWholeWord,
   setNoResult: actions.setNoResult,
   setIsProgrammaticSearch: actions.setIsProgrammaticSearch,
-  setIsProgrammaticSearchFull: actions.setIsProgrammaticSearchFull
+  setIsProgrammaticSearchFull: actions.setIsProgrammaticSearchFull,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate()(SearchOverlay));
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(onClickOutside(SearchOverlay)));

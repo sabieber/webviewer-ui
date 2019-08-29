@@ -18,15 +18,15 @@ class FilePickerHandler extends React.PureComponent {
     dispatch: PropTypes.func.isRequired,
     setDocumentFile: PropTypes.func.isRequired,
     openElement: PropTypes.func.isRequired,
-    closeElement: PropTypes.func.isRequired
+    closeElement: PropTypes.func.isRequired,
   }
 
   constructor() {
     super();
     this.accepted = [
-      supportedPDFExtensions.map(extension => '.' + extension),
-      supportedOfficeExtensions.map(extension => '.' + extension),
-      '.xod'
+      supportedPDFExtensions.map(extension => `.${extension}`),
+      supportedOfficeExtensions.map(extension => `.${extension}`),
+      '.xod',
     ].join(', ');
   }
 
@@ -34,7 +34,7 @@ class FilePickerHandler extends React.PureComponent {
     const file = e.target.files[0];
     if (file) {
       this.props.setDocumentFile(file);
-      this.props.openElement('loadingModal');
+      this.props.openElement('progressModal');
       this.props.closeElement('menuOverlay');
       core.closeDocument(this.props.dispatch).then(() => {
         loadDocument({ document: this.props.document, advanced: this.props.advanced }, this.props.dispatch);
@@ -58,7 +58,7 @@ class FilePickerHandler extends React.PureComponent {
 const mapStateToProps = state => ({
   document: selectors.getDocument(state),
   advanced: selectors.getAdvanced(state),
-  isDisabled: selectors.isElementDisabled(state, 'filePickerHandler')
+  isDisabled: selectors.isElementDisabled(state, 'filePickerHandler'),
 });
 
 const mapDispatchToProps = dispatch => ({

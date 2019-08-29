@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import onClickOutside from 'react-onclickoutside';
 
 import ActionButton from 'components/ActionButton';
 
@@ -17,16 +18,12 @@ import './TextPopup.scss';
 class TextPopup extends React.PureComponent {
   static propTypes = {
     isAnnotationToolsEnabled: PropTypes.bool,
-    isHighlightDisabled: PropTypes.bool,
-    isUnderlineDisabled: PropTypes.bool,
-    isSquigglyDisabled: PropTypes.bool,
-    isStrikeoutDisabled: PropTypes.bool,
     isDisabled: PropTypes.bool,
     isOpen: PropTypes.bool,
     dispatch: PropTypes.func.isRequired,
     openElement: PropTypes.func.isRequired,
     closeElement: PropTypes.func.isRequired,
-    closeElements: PropTypes.func.isRequired
+    closeElements: PropTypes.func.isRequired,
   }
 
   constructor() {
@@ -34,7 +31,7 @@ class TextPopup extends React.PureComponent {
     this.popup = React.createRef();
     this.state = {
       left: 0,
-      top: 0
+      top: 0,
     };
   }
 
@@ -43,12 +40,13 @@ class TextPopup extends React.PureComponent {
     this.underlineText = createTextAnnotationAndSelect.bind(this, this.props.dispatch, window.Annotations.TextUnderlineAnnotation);
     this.squigglyText = createTextAnnotationAndSelect.bind(this, this.props.dispatch, window.Annotations.TextSquigglyAnnotation);
     this.strikeoutText = createTextAnnotationAndSelect.bind(this, this.props.dispatch, window.Annotations.TextStrikeoutAnnotation);
+    this.redactText = createTextAnnotationAndSelect.bind(this, this.props.dispatch, window.Annotations.RedactionAnnotation);
     core.getTool('TextSelect').on('selectionComplete', this.onSelectionComplete);
   }
 
   componentDidUpdate(prevProps) {
     if (!prevProps.isOpen && this.props.isOpen) {
-      this.props.closeElements([ 'annotationPopup', 'contextMenuPopup' ]);
+      this.props.closeElements(['annotationPopup', 'contextMenuPopup']);
     }
   }
 
@@ -56,9 +54,17 @@ class TextPopup extends React.PureComponent {
     core.getTool('TextSelect').off('selectionComplete', this.onSelectionComplete);
   }
 
+  handleClickOutside = () => {
+    this.props.closeElement('textPopup');
+  }
+
   onSelectionComplete = (e, startQuad, allQuads) => {
-    this.positionTextPopup(allQuads);
-    this.props.openElement('textPopup');
+    const { isDisabled, openElement } = this.props;
+
+    if (!isDisabled) {
+      this.positionTextPopup(allQuads);
+      openElement('textPopup');
+    }
   }
 
   positionTextPopup = allQuads => {
@@ -79,25 +85,19 @@ class TextPopup extends React.PureComponent {
 
     const { left, top } = this.state;
     const className = getClassName('Popup TextPopup', this.props);
+    const isCreateRedactionEnabled = core.isCreateRedactionEnabled();
 
     return (
-      <div className={className} data-element={'textPopup'} ref={this.popup} style={{ left, top }} onMouseDown={e => e.stopPropagation()}>
+      <div className={className} data-element={'textPopup'} ref={this.popup} style={{ left, top }}>
         <ActionButton dataElement="copyTextButton" title="action.copy" img="ic_copy_black_24px" onClick={this.onClickCopy} />
         {this.props.isAnnotationToolsEnabled &&
-          <React.Fragment>
-            {!this.props.isHighlightDisabled &&
-              <ActionButton dataElement="textHighlightToolButton" title="annotation.highlight" img="ic_annotation_highlight_black_24px" onClick={this.highlightText} />
-            }
-            {!this.props.isUnderlineDisabled &&
-              <ActionButton dataElement="textUnderlineToolButton" title="annotation.underline" img="ic_annotation_underline_black_24px" onClick={this.underlineText} />
-            }
-            {!this.props.isSquigglyDisabled &&
-              <ActionButton dataElement="textSquigglyToolButton" title="annotation.squiggly" img="ic_annotation_squiggly_black_24px" onClick={this.squigglyText} />
-            }
-            {!this.props.isStrikeoutDisabled &&
-              <ActionButton dataElement="textStrikeoutToolButton" title="annotation.strikeout" img="ic_annotation_strikeout_black_24px" onClick={this.strikeoutText} />
-            }
-          </React.Fragment>
+          <>
+            <ActionButton dataElement="textHighlightToolButton" title="annotation.highlight" img="ic_annotation_highlight_black_24px" onClick={this.highlightText} />
+            <ActionButton dataElement="textUnderlineToolButton" title="annotation.underline" img="ic_annotation_underline_black_24px" onClick={this.underlineText} />
+            <ActionButton dataElement="textSquigglyToolButton" title="annotation.squiggly" img="ic_annotation_squiggly_black_24px" onClick={this.squigglyText} />
+            <ActionButton dataElement="textStrikeoutToolButton" title="annotation.strikeout" img="ic_annotation_strikeout_black_24px" onClick={this.strikeoutText} />
+            { isCreateRedactionEnabled && <ActionButton dataElement="textRedactToolButton" title="option.redaction.markForRedaction" img="ic_annotation_add_redact_black_24px" onClick={this.redactText} /> }
+          </>
         }
       </div>
     );
@@ -107,10 +107,6 @@ class TextPopup extends React.PureComponent {
 const mapStateToProps = state => ({
   isAnnotationToolsEnabled: !selectors.isElementDisabled(state, 'annotations') && !selectors.isDocumentReadOnly(state),
   isDisabled: selectors.isElementDisabled(state, 'textPopup'),
-  isHighlightDisabled: selectors.isToolDisabled(state, 'AnnotationCreateTextHighlight'),
-  isUnderlineDisabled: selectors.isToolDisabled(state, 'AnnotationCreateTextUnderline'),
-  isSquigglyDisabled: selectors.isToolDisabled(state, 'AnnotationCreateTextSquiggly'),
-  isStrikeoutDisabled: selectors.isToolDisabled(state, 'AnnotationCreateTextStrikeout'),
   isOpen: selectors.isElementOpen(state, 'textPopup'),
 });
 
@@ -121,4 +117,4 @@ const mapDispatchToProps = dispatch => ({
   closeElements: dataElements => dispatch(actions.closeElements(dataElements)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(TextPopup);
+export default connect(mapStateToProps, mapDispatchToProps)(onClickOutside(TextPopup));

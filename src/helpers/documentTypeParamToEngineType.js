@@ -1,11 +1,8 @@
-import { engineTypes, documentTypes } from 'constants/types';
+import { engineTypes } from 'constants/types';
 
-export default documentType => {
-  if (documentType === documentTypes.PDF || documentType === documentTypes.OFFICE || documentType === documentTypes.ALL) {
-    return engineTypes.PDFNETJS;
-  } else if (documentType === documentTypes.XOD) {
-    return engineTypes.UNIVERSAL;
-  } else {
-    return engineTypes.AUTO;
+export default (preloadWorker, pdftronServer) => {
+  if (pdftronServer) {
+    return engineTypes.PDFTRON_SERVER;
   }
+  return engineTypes.AUTO;
 };

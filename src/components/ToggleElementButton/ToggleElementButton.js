@@ -6,17 +6,14 @@ import selectors from 'selectors';
 import actions from 'actions';
 
 const mapStateToProps = (state, ownProps) => ({
-  className: 'ToggleElementButton',
-  isDisabled: selectors.isElementDisabled(state, ownProps.dataElement),
-  isActive: selectors.isElementOpen(state, ownProps.element),
+  className: ownProps.className || 'ToggleElementButton',
+  isActive: selectors.isElementActive(state, ownProps),
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  onClick: e => {
-    e.stopPropagation();
-    
+  onClick: () => {
     dispatch(actions.toggleElement(ownProps.element));
-  }
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Button);

@@ -1,5 +1,7 @@
 import core from 'core';
 import actions from 'actions';
+import { isIOS } from 'helpers/device';
+import getDefaultPageLabels from 'helpers/getDefaultPageLabels';
 
 export default dispatch => () => {
   // if we are opening an password-protected pdf,
@@ -7,15 +9,17 @@ export default dispatch => () => {
   dispatch(actions.closeElement('passwordModal'));
 
   const totalPages = core.getTotalPages();
-  if (totalPages > 500) {
+
+  if (isIOS) {
+    window.CoreControls.SetCachingLevel(8); // 32MB
+    window.CoreControls.SetPreRenderLevel(2); // so that we can enable high res thumb
+  } else if (totalPages > 500) {
     core.setDisplayMode(window.CoreControls.DisplayModes.Single);
   }
 
   dispatch(actions.setPageLabels(getDefaultPageLabels(totalPages)));
   dispatch(actions.setTotalPages(totalPages));
-  
+
   const currentPage = core.getCurrentPage();
   dispatch(actions.setCurrentPage(currentPage));
 };
-
-const getDefaultPageLabels = totalPages => new Array(totalPages).fill().map((_, index) => `${index + 1}`); 

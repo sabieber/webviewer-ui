@@ -1,97 +1,104 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { translate } from 'react-i18next';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 import Icon from 'components/Icon';
 
 import core from 'core';
-import getClassName from 'helpers/getClassName';
 import actions from 'actions';
 import selectors from 'selectors';
 
 import './NotePopup.scss';
 
-class NotePopup extends React.Component {
-  static propTypes = {
-    annotation: PropTypes.object.isRequired,
-    notePopupId: PropTypes.string.isRequired,
-    isNoteExpanded: PropTypes.bool.isRequired,
-    setNotePopupId: PropTypes.func.isRequired,
-    openEditing: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired
-  }
-
-  constructor(props) {
-    super(props);
-    this.state = { 
-      canModify: core.canModify(props.annotation)
-    };
-  }
-
-  componentDidMount() {
-    core.addEventListener('updateAnnotationPermission', this.onUpdateAnnotationPermission);
-  }
-
-  componentWillUnmount() {
-    core.removeEventListener('updateAnnotationPermission', this.onUpdateAnnotationPermission);
-  }
-
-  onUpdateAnnotationPermission = () => {
-    this.setState({
-      canModify: core.canModify(this.props.annotation)
-    });
-  }
-
-  togglePopup = () => {
-    const { notePopupId, annotation, setNotePopupId } = this.props;
-    const isOpen = notePopupId === annotation.Id;
-
-    if (isOpen) {
-      setNotePopupId('');
-    } else {
-      setNotePopupId(annotation.Id);
-    }
-  }
-
-  closePopup = () => {
-    this.props.setNotePopupId('');
-  }
-
-  openEdit = () => {
-    this.props.openEditing();
-  }
-
-  render() {
-    const { canModify } = this.state;
-    const { t, isNoteExpanded, notePopupId, annotation, onDelete } = this.props;
-    const isOpen = notePopupId === annotation.Id;
-    const className = getClassName('modify', { isOpen });
-
-    if (!canModify || !isNoteExpanded) {
-      return null;
-    }
-
-    return(
-      <div className="NotePopup" onClick={e => e.stopPropagation()}>
-        <div className="overflow" onClick={this.togglePopup}>
-          <Icon glyph="ic_overflow_black_24px" />
-        </div>
-        <div className={className} onClick={this.closePopup}>
-          <div onClick={this.openEdit}>{t('action.edit')}</div>
-          <div onClick={onDelete}>{t('action.delete')}</div>
-        </div>
-      </div>
-    );
-  }
-}
-
-const mapStateToProps = state => ({
-  notePopupId: selectors.getNotePopupId(state)
-});
-
-const mapDispatchToProps = {
-  setNotePopupId: actions.setNotePopupId
+const propTypes = {
+  annotation: PropTypes.object.isRequired,
+  setIsEditing: PropTypes.func.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate()(NotePopup));
+const NotePopup = ({ annotation, setIsEditing }) => {
+  const [
+    notePopupId,
+    isDisabled,
+    isEditDisabled,
+    isDeleteDisabled,
+  ] = useSelector(
+    state => [
+      selectors.getNotePopupId(state),
+      selectors.isElementDisabled(state, 'notePopup'),
+      selectors.isElementDisabled(state, 'notePopupEdit'),
+      selectors.isElementDisabled(state, 'notePopupDelete'),
+    ],
+    shallowEqual,
+  );
+  const [canModify, setCanModify] = useState(core.canModify(annotation));
+  const [t] = useTranslation();
+  const dispatch = useDispatch();
+  const isOpen = notePopupId === annotation.Id;
+
+  useEffect(() => {
+    const onUpdateAnnotationPermission = () => {
+      setCanModify(core.canModify(annotation));
+    };
+
+    core.addEventListener(
+      'updateAnnotationPermission',
+      onUpdateAnnotationPermission,
+    );
+    return () =>
+      core.removeEventListener(
+        'updateAnnotationPermission',
+        onUpdateAnnotationPermission,
+      );
+  }, [annotation]);
+
+  const togglePopup = () => {
+    if (isOpen) {
+      closePopup();
+    } else {
+      dispatch(actions.setNotePopupId(annotation.Id));
+    }
+  };
+
+  const closePopup = () => {
+    dispatch(actions.setNotePopupId(''));
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleDelete = () => {
+    core.deleteAnnotations([annotation]);
+  };
+
+  return !canModify || isDisabled ? null : (
+    <div
+      className="NotePopup"
+      data-element="notePopup"
+      onMouseDown={e => e.stopPropagation()}
+    >
+      <div className="overflow" onClick={togglePopup}>
+        <Icon glyph="ic_overflow_black_24px" />
+      </div>
+      {isOpen && (
+        <div className="options" onClick={closePopup}>
+          {!isEditDisabled && (
+            <div data-element="notePopupEdit" onClick={handleEdit}>
+              {t('action.edit')}
+            </div>
+          )}
+          {!isDeleteDisabled && (
+            <div data-element="notePopupDelete" onClick={handleDelete}>
+              {t('action.delete')}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+NotePopup.propTypes = propTypes;
+
+export default NotePopup;
