@@ -238,7 +238,7 @@ export default store => {
     useEmbeddedPrint: useEmbeddedPrint(store),
     setMaxSignaturesCount: setMaxSignaturesCount(store),
     getCustomData: () => getHashParams('custom', null), // undocumented
-    setNoteCustomContentRenderer,
-    setThumbnailCustomContentRenderer,
+    setNoteCustomContentRenderer: setNoteCustomContentRenderer(store),
+    setThumbnailCustomContentRenderer: setThumbnailCustomContentRenderer(store),
   };
 };
