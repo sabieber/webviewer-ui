@@ -30,12 +30,14 @@ const NoteContent = ({ annotation }) => {
     noteDateFormat,
     iconColor,
     isNoteEditingTriggeredByAnnotationPopup,
+    noteCustomContentRenderer,
   ] = useSelector(
     state => [
       selectors.getSortStrategy(state),
       selectors.getNoteDateFormat(state),
       selectors.getIconColor(state, mapAnnotationToKey(annotation)),
       selectors.getIsNoteEditing(state),
+      selectors.getNoteCustomContentRenderer(state),
     ],
     shallowEqual,
   );
@@ -170,6 +172,11 @@ const NoteContent = ({ annotation }) => {
       onMouseDown={e => e.preventDefault()}
     >
       {header}
+      { noteCustomContentRenderer &&
+      <div className="customContent">
+        {noteCustomContentRenderer(annotation, React)}
+      </div>
+      }
       <div className="content-container" onMouseDown={handleContainerClick}>
         {isEditing ? (
           <ContentArea annotation={annotation} setIsEditing={setIsEditing} />
