@@ -120,6 +120,8 @@ export default initialState => (state = initialState, action) => {
       return { ...state, noteDateFormat: payload.noteDateFormat };
     case 'SET_NOTE_CUSTOM_CONTENT_RENDERER':
       return { ...state, noteCustomContentRenderer: payload.noteCustomContentRenderer };
+    case 'SET_NOTES_PANEL_CUSTOM_HEADER_RENDERER':
+      return { ...state, notesPanelCustomHeaderRenderer: payload.notesPanelCustomHeaderRenderer };
     case 'SET_FULL_SCREEN':
       return { ...state, isFullScreen: payload.isFullScreen };
     case 'SET_HEADER_ITEMS':

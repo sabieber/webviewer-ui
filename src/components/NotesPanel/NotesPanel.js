@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect, useImperativeHandle } from 'react';
+import React, {useState, useRef, useEffect, useImperativeHandle} from 'react';
 import PropTypes from 'prop-types';
-import { useSelector, shallowEqual } from 'react-redux';
+import {useSelector, shallowEqual} from 'react-redux';
 import Measure from 'react-measure';
-import { CellMeasurer, CellMeasurerCache, List } from 'react-virtualized';
-import { useTranslation } from 'react-i18next';
+import {CellMeasurer, CellMeasurerCache, List} from 'react-virtualized';
+import {useTranslation} from 'react-i18next';
 
 import Dropdown from 'components/Dropdown';
 import Note from 'components/Note';
@@ -21,12 +21,13 @@ const propTypes = {
 };
 
 const NotesPanel = ({ display }) => {
-  const [sortStrategy, isDisabled, pageLabels, customNoteFilter] = useSelector(
+  const [sortStrategy, isDisabled, pageLabels, customNoteFilter, notesPanelCustomHeaderRenderer] = useSelector(
     state => [
       selectors.getSortStrategy(state),
       selectors.isElementDisabled(state, 'notesPanel'),
       selectors.getPageLabels(state),
       selectors.getCustomNoteFilter(state),
+      selectors.getNotesPanelCustomHeaderRenderer(state),
     ],
     shallowEqual,
   );
@@ -247,14 +248,21 @@ const NotesPanel = ({ display }) => {
         <div className="no-annotations">{t('message.noAnnotations')}</div>
       ) : (
         <>
-          <div className="header">
-            <input
-              type="text"
-              placeholder={t('message.searchPlaceholder')}
-              onChange={handleInputChange}
-            />
-            <Dropdown items={Object.keys(getSortStrategies())} />
-          </div>
+          {notesPanelCustomHeaderRenderer ? (
+            <div className="customHeader">
+              {notesPanelCustomHeaderRenderer(React)}
+            </div>
+          ) : (
+            <div className="header">
+              <input
+                type="text"
+                placeholder={t('message.searchPlaceholder')}
+                onChange={handleInputChange}
+              />
+              <Dropdown items={Object.keys(getSortStrategies())}/>
+            </div>
+          )}
+
           {notesToRender.length === 0 ? (
             <div className="no-results">{t('message.noResults')}</div>
           ) : notesToRender.length <= VIRTUALIZATION_THRESHOLD ? (

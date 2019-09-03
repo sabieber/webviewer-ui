@@ -24,6 +24,7 @@ import disableTools from './disableTools';
 import disableTouchScrollLock from './disableTouchScrollLock';
 import downloadPdf from './downloadPdf';
 import setNoteCustomContentRenderer from './setNoteCustomContentRenderer';
+import setNotesPanelCustomHeaderRenderer from './setNotesPanelCustomHeaderRenderer';
 import enableAllElements from './enableAllElements';
 import enableAnnotations from './enableAnnotations';
 import enableDownload from './enableDownload';
@@ -239,6 +240,7 @@ export default store => {
     setMaxSignaturesCount: setMaxSignaturesCount(store),
     getCustomData: () => getHashParams('custom', null), // undocumented
     setNoteCustomContentRenderer: setNoteCustomContentRenderer(store),
+    setNotesPanelCustomHeaderRenderer: setNotesPanelCustomHeaderRenderer(store),
     setThumbnailCustomContentRenderer: setThumbnailCustomContentRenderer(store),
   };
 };

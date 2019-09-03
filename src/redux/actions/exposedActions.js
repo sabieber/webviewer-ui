@@ -145,6 +145,10 @@ export const setNoteCustomContentRenderer = noteCustomContentRenderer => ({
   type: 'SET_NOTE_CUSTOM_CONTENT_RENDERER',
   payload: { noteCustomContentRenderer }
 });
+export const setNotesPanelCustomHeaderRenderer = notesPanelCustomHeaderRenderer => ({
+  type: 'SET_NOTES_PANEL_CUSTOM_HEADER_RENDERER',
+  payload: { notesPanelCustomHeaderRenderer }
+});
 export const updateTool = (toolName, properties) => ({ type: 'UPDATE_TOOL', payload: { toolName, properties } });
 export const setSortStrategy = sortStrategy => ({
   type: 'SET_SORT_STRATEGY',
