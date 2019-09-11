@@ -68,7 +68,7 @@ const Note = ({ annotation }) => {
 
       <div className={repliesClass}>
         {replies.map(reply => (
-          <NoteContent key={reply.Id} annotation={reply} />
+          <NoteContent key={reply.Id} annotation={reply} isComment />
         ))}
         <ReplyArea annotation={annotation} />
       </div>

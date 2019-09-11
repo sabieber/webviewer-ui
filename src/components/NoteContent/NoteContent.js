@@ -22,9 +22,10 @@ import './NoteContent.scss';
 
 const propTypes = {
   annotation: PropTypes.object.isRequired,
+  isComment: PropTypes.bool
 };
 
-const NoteContent = ({ annotation }) => {
+const NoteContent = ({ annotation, isComment }) => {
   const [
     sortStrategy,
     noteDateFormat,
@@ -172,7 +173,7 @@ const NoteContent = ({ annotation }) => {
       onMouseDown={e => e.preventDefault()}
     >
       {header}
-      { noteCustomContentRenderer &&
+      { !isComment && noteCustomContentRenderer &&
       <div className="customContent">
         {noteCustomContentRenderer(annotation, React)}
       </div>
