@@ -245,7 +245,14 @@ const NotesPanel = ({ display }) => {
       onMouseDown={core.deselectAllAnnotations}
     >
       {notes.length === 0 ? (
+        <>
+          {notesPanelCustomHeaderRenderer &&
+          <div className="customHeader">
+            {notesPanelCustomHeaderRenderer(React)}
+          </div>
+          }
         <div className="no-annotations">{t('message.noAnnotations')}</div>
+        </>
       ) : (
         <>
           {notesPanelCustomHeaderRenderer ? (
