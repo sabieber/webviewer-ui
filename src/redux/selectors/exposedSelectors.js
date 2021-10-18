@@ -445,3 +445,6 @@ export const getWv3dPropertiesPanelModelData = state => state.wv3dPropertiesPane
 export const getWv3dPropertiesPanelSchema = state => state.wv3dPropertiesPanel.schema;
 
 export const getAnnotationFilters = state => state.viewer.annotationFilters;
+
+
+export const getThumbnailCustomContentRenderer = state => state.viewer.thumbnailCustomContentRenderer;
