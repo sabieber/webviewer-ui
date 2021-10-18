@@ -623,3 +623,8 @@ export const setZoomStepFactors = (zoomStepFactors) => ({
   type: 'SET_ZOOM_STEP_FACTORS',
   payload: { zoomStepFactors }
 });
+
+export const setThumbnailCustomContentRenderer = thumbnailCustomContentRenderer => ({
+  type: "SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER",
+  payload: { thumbnailCustomContentRenderer }
+});

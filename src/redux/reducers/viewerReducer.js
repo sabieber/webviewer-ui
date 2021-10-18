@@ -555,6 +555,11 @@ export default initialState => (state = initialState, action) => {
       return { ...state, annotationFilters: payload.annotationFilters };
     case 'SET_ZOOM_STEP_FACTORS': 
       return { ...state, zoomStepFactors: payload.zoomStepFactors };
+    case 'SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER':
+      return {
+        ...state,
+        thumbnailCustomContentRenderer: payload.thumbnailCustomContentRenderer
+      };
     default:
       return state;
   }

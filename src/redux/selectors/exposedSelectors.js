@@ -466,3 +466,6 @@ export const shouldResetAudioPlaybackPosition = state => state.viewer.shouldRese
 export const getActiveSoundAnnotation = state => state.viewer.activeSoundAnnotation;
 
 export const getAnnotationFilters = state => state.viewer.annotationFilters;
+
+
+export const getThumbnailCustomContentRenderer = state => state.viewer.thumbnailCustomContentRenderer;

@@ -212,6 +212,7 @@ import addRedactionSearchPattern from './addRedactionSearchPattern';
 import removeRedactionSearchPattern from './removeRedactionSearchPattern';
 import getZoomStepFactors from './getZoomStepFactors';
 import setZoomStepFactors from './setZoomStepFactors';
+import setThumbnailCustomContentRenderer from './setThumbnailCustomContentRenderer';
 
 export default store => {
   const CORE_NAMESPACE = 'Core';
@@ -460,6 +461,9 @@ export default store => {
     enablePageDeletionConfirmationModal: enablePageDeletionConfirmationModal(store),
     getZoomStepFactors: getZoomStepFactors(store),
     setZoomStepFactors: setZoomStepFactors(store),
+
+    // OXOMI custom
+    setThumbnailCustomContentRenderer: setThumbnailCustomContentRenderer(store),
   };
 
   window.instance = {
