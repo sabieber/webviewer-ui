@@ -194,6 +194,7 @@ import Fonts from 'src/apis/fonts';
 import TabManagerAPI from './TabManagerAPI';
 import getAvailableLanguages from './getAvailableLanguages';
 import replaceRedactionSearchPattern from './replaceRedactionSearchPattern';
+import setThumbnailCustomContentRenderer from './setThumbnailCustomContentRenderer';
 
 export default store => {
   const CORE_NAMESPACE = 'Core';
@@ -414,6 +415,9 @@ export default store => {
     isInDesktopOnlyMode: isInDesktopOnlyMode(store),
     disablePageDeletionConfirmationModal: disablePageDeletionConfirmationModal(store),
     enablePageDeletionConfirmationModal: enablePageDeletionConfirmationModal(store),
+    
+    // OXOMI custom
+    setThumbnailCustomContentRenderer: setThumbnailCustomContentRenderer(store),
   };
 
   window.instance = {

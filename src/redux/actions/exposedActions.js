@@ -578,3 +578,8 @@ export const replaceRedactionSearchPattern = (searchPattern, regex) => ({
   type: 'REPLACE_REDACTION_SEARCH_PATTERN',
   payload: { searchPattern, regex }
 });
+
+export const setThumbnailCustomContentRenderer = thumbnailCustomContentRenderer => ({
+  type: "SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER",
+  payload: { thumbnailCustomContentRenderer }
+});

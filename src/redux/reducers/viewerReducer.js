@@ -521,6 +521,11 @@ export default initialState => (state = initialState, action) => {
       return { ...state, shouldResetAudioPlaybackPosition: payload.shouldResetAudioPlaybackPosition };
     case 'SET_ACTIVE_SOUND_ANNOTATION':
       return { ...state, activeSoundAnnotation: payload.activeSoundAnnotation };
+    case 'SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER':
+      return {
+        ...state,
+        thumbnailCustomContentRenderer: payload.thumbnailCustomContentRenderer
+      };
     default:
       return state;
   }

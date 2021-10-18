@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import useDidUpdate from 'hooks/useDidUpdate';
 import core from 'core';
+import selectors from 'selectors';
 import ThumbnailControls from 'components/ThumbnailControls';
 
 import './Thumbnail.scss';
 import { Choice } from "@pdftron/webviewer-react-toolkit";
 import { workerTypes } from "constants/types";
+import { useSelector } from "react-redux";
 
 // adds a delay in ms so thumbs that are only on the screen briefly are not loaded.
 const THUMBNAIL_LOAD_DELAY = 50;
@@ -43,6 +45,8 @@ const Thumbnail = ({
   const [loaded, setLoaded] = useState(false);
 
   let loadTimeout = null;
+
+  const [thumbnailCustomContentRenderer] = useSelector(state => [selectors.getThumbnailCustomContentRenderer(state)]);
 
   const loadThumbnailAsync = () => {
     loadTimeout = setTimeout(() => {
@@ -239,6 +243,11 @@ const Thumbnail = ({
         />}
       </div>
       <div className="page-label">{pageLabel}</div>
+      { thumbnailCustomContentRenderer &&
+          <div className="customContent">
+            {thumbnailCustomContentRenderer(index, React)}
+          </div>
+      }
       {!isThumbnailSelectingPages && isActive && shouldShowControls && <ThumbnailControls index={index} />}
     </div>
   );
