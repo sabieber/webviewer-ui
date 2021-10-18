@@ -544,3 +544,8 @@ export const disablePageDeletionConfirmationModal = () => ({
   type: "PAGE_DELETION_CONFIRMATION_MODAL_POPUP",
   payload: { pageDeletionConfirmationModalEnabled: false }
 });
+
+export const setThumbnailCustomContentRenderer = thumbnailCustomContentRenderer => ({
+  type: "SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER",
+  payload: { thumbnailCustomContentRenderer }
+});

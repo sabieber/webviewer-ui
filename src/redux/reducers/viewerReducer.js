@@ -427,6 +427,11 @@ export default initialState => (state = initialState, action) => {
         ...state,
         pageManipulationOverlay: payload.items,
       };
+    case 'SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER':
+      return {
+        ...state,
+        thumbnailCustomContentRenderer: payload.thumbnailCustomContentRenderer
+      };
     default:
       return state;
   }

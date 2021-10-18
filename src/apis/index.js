@@ -178,6 +178,7 @@ import enableDesktopOnlyMode from './enableDesktopOnlyMode';
 import disableDesktopOnlyMode from './disableDesktopOnlyMode';
 import isInDesktopOnlyMode from './isInDesktopOnlyMode';
 import pageManipulationOverlay from './pageManipulationOverlay';
+import setThumbnailCustomContentRenderer from './setThumbnailCustomContentRenderer';
 
 export default store => {
   const CORE_NAMESPACE = 'Core';
@@ -378,6 +379,9 @@ export default store => {
     isInDesktopOnlyMode: isInDesktopOnlyMode(store),
     disablePageDeletionConfirmationModal: disablePageDeletionConfirmationModal(store),
     enablePageDeletionConfirmationModal: enablePageDeletionConfirmationModal(store),
+    
+    // OXOMI custom
+    setThumbnailCustomContentRenderer: setThumbnailCustomContentRenderer(store),
   };
 
   window.instance = {

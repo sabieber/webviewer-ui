@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
 import classNames from 'classnames';
 
+import selectors from 'selectors';
 import core from 'core';
 import ThumbnailControls from 'components/ThumbnailControls';
 
 import './Thumbnail.scss';
+import {useSelector} from "react-redux";
 
 const Thumbnail = ({
   index,
@@ -29,6 +31,8 @@ const Thumbnail = ({
   isMobile
 }) => {
   const thumbSize = thumbnailSize ? Number(thumbnailSize) : 150;
+
+  const [thumbnailCustomContentRenderer] = useSelector(state => [selectors.getThumbnailCustomContentRenderer(state)]);
 
   useEffect(() => {
     const loadThumbnailAsync = () => {
@@ -193,6 +197,11 @@ const Thumbnail = ({
         <div id={`pageThumb${index}`} className="thumbnail" />
       </div>
       <div className="page-label">{pageLabel}</div>
+      { thumbnailCustomContentRenderer &&
+          <div className="customContent">
+            {thumbnailCustomContentRenderer(index, React)}
+          </div>
+      }
       {isActive && shouldShowControls && <ThumbnailControls index={index} />}
     </div>
   );
