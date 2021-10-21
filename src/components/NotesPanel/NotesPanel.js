@@ -33,7 +33,8 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
     notesInLeftPanel,
     isDocumentReadOnly,
     enableNotesPanelVirtualizedList,
-    isInDesktopOnlyMode
+    isInDesktopOnlyMode,
+    notesPanelCustomHeaderRenderer
   ] = useSelector(
     state => [
       selectors.getSortStrategy(state),
@@ -45,7 +46,8 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
       selectors.getNotesInLeftPanel(state),
       selectors.isDocumentReadOnly(state),
       selectors.getEnableNotesPanelVirtualizedList(state),
-      selectors.isInDesktopOnlyMode(state)
+      selectors.isInDesktopOnlyMode(state),
+      selectors.getNotesPanelCustomHeaderRenderer(state),
     ],
     shallowEqual,
   );
@@ -376,6 +378,11 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
           </div>
         </div>}
       <React.Fragment>
+        {notesPanelCustomHeaderRenderer ? (
+            <div className="customHeader">
+              {notesPanelCustomHeaderRenderer(React)}
+            </div>
+        ) : (
         <div className="header">
           <div className="input-container">
             <input
@@ -414,6 +421,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
             </div>
           </div>
         </div>
+        )}
         {notesToRender.length === 0 ? (notes.length === 0 ? NoAnnotations : NoResults) : notesToRender.length <= VIRTUALIZATION_THRESHOLD ? (
           <NormalList
             ref={listRef}

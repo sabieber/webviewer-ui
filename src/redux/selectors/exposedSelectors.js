@@ -378,3 +378,5 @@ export const pageDeletionConfirmationModalEnabled = state => state.viewer.pageDe
 export const getPageManipulationOverlayItems = state => state.viewer.pageManipulationOverlay;
 
 export const getThumbnailCustomContentRenderer = state => state.viewer.thumbnailCustomContentRenderer;
+
+export const getNotesPanelCustomHeaderRenderer = state => state.viewer.notesPanelCustomHeaderRenderer;
