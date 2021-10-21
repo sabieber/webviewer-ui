@@ -195,6 +195,7 @@ import TabManagerAPI from './TabManagerAPI';
 import getAvailableLanguages from './getAvailableLanguages';
 import replaceRedactionSearchPattern from './replaceRedactionSearchPattern';
 import setThumbnailCustomContentRenderer from './setThumbnailCustomContentRenderer';
+import setNotesPanelCustomHeaderRenderer from './setNotesPanelCustomHeaderRenderer';
 
 export default store => {
   const CORE_NAMESPACE = 'Core';
@@ -418,6 +419,7 @@ export default store => {
     
     // OXOMI custom
     setThumbnailCustomContentRenderer: setThumbnailCustomContentRenderer(store),
+    setNotesPanelCustomHeaderRenderer: setNotesPanelCustomHeaderRenderer(store),
   };
 
   window.instance = {

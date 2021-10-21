@@ -434,3 +434,5 @@ export const shouldResetAudioPlaybackPosition = state => state.viewer.shouldRese
 export const getActiveSoundAnnotation = state => state.viewer.activeSoundAnnotation;
 
 export const getThumbnailCustomContentRenderer = state => state.viewer.thumbnailCustomContentRenderer;
+
+export const getNotesPanelCustomHeaderRenderer = state => state.viewer.notesPanelCustomHeaderRenderer;
