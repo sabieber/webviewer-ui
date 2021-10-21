@@ -448,3 +448,5 @@ export const getAnnotationFilters = state => state.viewer.annotationFilters;
 
 
 export const getThumbnailCustomContentRenderer = state => state.viewer.thumbnailCustomContentRenderer;
+
+export const getNotesPanelCustomHeaderRenderer = state => state.viewer.notesPanelCustomHeaderRenderer;
