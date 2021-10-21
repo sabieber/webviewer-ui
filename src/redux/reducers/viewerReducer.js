@@ -560,6 +560,11 @@ export default initialState => (state = initialState, action) => {
         ...state,
         thumbnailCustomContentRenderer: payload.thumbnailCustomContentRenderer
       };
+    case 'SET_NOTES_PANEL_CUSTOM_HEADER_RENDERER':
+      return {
+        ...state,
+        notesPanelCustomHeaderRenderer: payload.notesPanelCustomHeaderRenderer
+      };
     default:
       return state;
   }

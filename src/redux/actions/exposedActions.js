@@ -628,3 +628,8 @@ export const setThumbnailCustomContentRenderer = thumbnailCustomContentRenderer 
   type: "SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER",
   payload: { thumbnailCustomContentRenderer }
 });
+
+export const setNotesPanelCustomHeaderRenderer = notesPanelCustomHeaderRenderer => ({
+  type: "SET_NOTES_PANEL_CUSTOM_HEADER_RENDERER",
+  payload: { notesPanelCustomHeaderRenderer }
+});
