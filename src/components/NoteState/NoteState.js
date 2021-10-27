@@ -100,14 +100,6 @@ function NoteState(props) {
               {t('option.state.rejected')}
             </DataElementWrapper>
             <DataElementWrapper
-              dataElement="notePopupStateCancelled"
-              className="note-state-option"
-              onClick={createOnStateOptionButtonClickHandler('Cancelled')}
-            >
-              <Icon glyph="icon-annotation-status-cancelled" />
-              {t('option.state.cancelled')}
-            </DataElementWrapper>
-            <DataElementWrapper
               dataElement="notePopupStateCompleted"
               className="note-state-option"
               onClick={createOnStateOptionButtonClickHandler('Completed')}
@@ -122,22 +114,6 @@ function NoteState(props) {
             >
               <Icon glyph="icon-annotation-status-none" />
               {t('option.state.none')}
-            </DataElementWrapper>
-            <DataElementWrapper
-              dataElement="notePopupStateMarked"
-              className="note-state-option"
-              onClick={createOnStateOptionButtonClickHandler('Marked')}
-            >
-              <Icon glyph="icon-annotation-status-marked" />
-              {t('option.state.marked')}
-            </DataElementWrapper>
-            <DataElementWrapper
-              dataElement="notePopupStateUnmarked"
-              className="note-state-option"
-              onClick={createOnStateOptionButtonClickHandler('Unmarked')}
-            >
-              <Icon glyph="icon-annotation-status-unmarked" />
-              {t('option.state.unmarked')}
             </DataElementWrapper>
           </DataElementWrapper>
         </button>
