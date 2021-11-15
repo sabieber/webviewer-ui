@@ -92,6 +92,7 @@ const PrintModal = () => {
         aria-label={t('message.customPrintPlaceholder')}
         onChange={onChange}
         disabled={isPrinting}
+        autoFocus={true}
       />
     </>
   );
@@ -280,6 +281,7 @@ const PrintModal = () => {
                 />
                 <Choice
                   dataElement="currentViewPrintOption"
+                  className="always-hide"
                   ref={currentView}
                   id="current-view"
                   name="pages"
@@ -301,6 +303,7 @@ const PrintModal = () => {
                 />
                 <Choice
                   dataElement="commentsPrintOption"
+                  className="always-hide"
                   ref={includeCommentsRef}
                   id="include-comments"
                   name="comments"
@@ -312,6 +315,7 @@ const PrintModal = () => {
                 />
                 <Choice
                   dataElement="annotationsPrintOption"
+                  className="always-hide"
                   id="include-annotations"
                   name="annotations"
                   label={t('option.print.includeAnnotations')}
@@ -322,6 +326,7 @@ const PrintModal = () => {
                 />
                 <Choice
                   dataElement="grayscalePrintOption"
+                  className="always-hide"
                   id="print-grayscale"
                   name="grayscale"
                   label={t('option.print.printGrayscale')}
@@ -332,7 +337,7 @@ const PrintModal = () => {
                 />
               </form>
             </div>
-            <DataElementWrapper className="section" dataElement={DataElements.PRINT_QUALITY}>
+            <DataElementWrapper className="section always-hide" dataElement={DataElements.PRINT_QUALITY}>
               <div className="section-label">{`${t('option.print.pageQuality')}:`}</div>
               <label className="printQualitySelectLabel">
                 <select
