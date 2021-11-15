@@ -236,6 +236,7 @@ class PrintModal extends React.PureComponent {
         aria-label={t('message.customPrintPlaceholder')}
         onChange={this.onInputChange}
         disabled={isPrinting}
+        autoFocus="true"
       />
     );
 
@@ -294,6 +295,7 @@ class PrintModal extends React.PureComponent {
                     />
                     <Choice
                       dataElement="currentViewPrintOption"
+                      className="always-hide"
                       ref={this.currentView}
                       id="current-view"
                       name="pages"
@@ -314,6 +316,7 @@ class PrintModal extends React.PureComponent {
                     />
                     <Choice
                       dataElement="commentsPrintOption"
+                      className="always-hide"
                       ref={this.includeComments}
                       id="include-comments"
                       name="comments"
@@ -329,6 +332,7 @@ class PrintModal extends React.PureComponent {
                     />
                     <Choice
                       dataElement="annotationsPrintOption"
+                      className="always-hide"
                       id="include-annotations"
                       name="annotations"
                       label={t('option.print.includeAnnotations')}
@@ -342,7 +346,7 @@ class PrintModal extends React.PureComponent {
                       center
                     />
                   </form>
-                  <div>
+                  <div className="always-hide">
                     <div className="col">
                       <label>
                         {`${t('option.print.pageQuality')}:`}
