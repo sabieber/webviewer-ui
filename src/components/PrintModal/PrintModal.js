@@ -343,9 +343,9 @@ class PrintModal extends React.PureComponent {
                     />
                   </form>
                 </div>
-                <div className="section always-hide">
-                  <div className="section-label">{`${t('option.print.pageQuality')}:`}</div>
-                  <label className="printQualitySelectLabel">
+                <div className="section">
+                  <div className="section-label always-hide">{`${t('option.print.pageQuality')}:`}</div>
+                  <label className="printQualitySelectLabel always-hide">
                     <select className="printQualitySelect" onChange={e => this.props.setPrintQuality(Number(e.target.value))} value={this.props.printQuality}>
                       <option value="2">{`${t('option.print.qualityHigh')}`}</option>
                       <option value="1">{`${t('option.print.qualityNormal')}`}</option>
