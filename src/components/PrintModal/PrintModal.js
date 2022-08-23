@@ -232,7 +232,7 @@ class PrintModal extends React.PureComponent {
           aria-label={t('message.customPrintPlaceholder')}
           onChange={this.onChange}
           disabled={isPrinting}
-          autoFocus="true"
+          autoFocus={true}
         />
       </>
     );
