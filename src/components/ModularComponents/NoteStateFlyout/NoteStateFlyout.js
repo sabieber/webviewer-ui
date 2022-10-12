@@ -16,7 +16,6 @@ const createFlyoutItem = (option, icon, dataElement) => ({
 export const noteStateFlyoutItems = [
   createFlyoutItem('Accepted', 'icon-annotation-status-accepted', 'noteStateFlyoutAcceptedOption'),
   createFlyoutItem('Rejected', 'icon-annotation-status-rejected', 'noteStateFlyoutRejectedOption'),
-  createFlyoutItem('Cancelled', 'icon-annotation-status-cancelled', 'noteStateFlyoutCancelledOption'),
   createFlyoutItem('Completed', 'icon-annotation-status-completed', 'noteStateFlyoutCompletedOption'),
   createFlyoutItem('None', 'icon-annotation-status-none', 'noteStateFlyoutNoneOption'),
   createFlyoutItem('Marked', 'icon-annotation-status-marked', 'noteStateFlyoutMarkedOption'),
