@@ -1063,6 +1063,11 @@ export const setAnnotationToolStyleSyncingEnabled = (isAnnotationToolStyleSyncin
   payload: isAnnotationToolStyleSyncingEnabled
 });
 
+export const setThumbnailCustomContentRenderer = (thumbnailCustomContentRenderer) => ({
+  type: 'SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER',
+  payload: { thumbnailCustomContentRenderer }
+});
+
 export const setMultiViewerSyncScrollingMode = (multiViewerComparedSyncScrollingMode) => ({
   type: 'SET_MULTI_VIEWER_SYNC_SCROLLING_MODE',
   payload: multiViewerComparedSyncScrollingMode
