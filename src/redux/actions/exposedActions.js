@@ -679,3 +679,8 @@ export const setReplyAttachmentPreviewEnabled = (replyAttachmentPreviewEnabled) 
   type: 'SET_REPLY_ATTACHMENT_PREVIEW',
   payload: { replyAttachmentPreviewEnabled }
 });
+
+export const setThumbnailCustomContentRenderer = (thumbnailCustomContentRenderer) => ({
+  type: 'SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER',
+  payload: { thumbnailCustomContentRenderer }
+});

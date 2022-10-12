@@ -247,6 +247,7 @@ import {
 } from './measurementScale';
 import getLocalizedText from './getLocalizedText';
 import { enableMultiViewerSync, disableMultiViewerSync, isMultiViewerSyncing } from './multiViewerSync';
+import setThumbnailCustomContentRenderer from './setThumbnailCustomContentRenderer';
 
 export default (store) => {
   const CORE_NAMESPACE = 'Core';
@@ -526,6 +527,9 @@ export default (store) => {
     AnnotationStylePopupTabs,
     getZoomStepFactors: getZoomStepFactors(store),
     setZoomStepFactors: setZoomStepFactors(store),
+
+    // OXOMI custom
+    setThumbnailCustomContentRenderer: setThumbnailCustomContentRenderer(store),
   };
   const documentViewer = core.getDocumentViewer(1);
 

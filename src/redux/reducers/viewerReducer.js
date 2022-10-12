@@ -714,6 +714,11 @@ export default (initialState) => (state = initialState, action) => {
       };
     case 'SET_REPLY_ATTACHMENT_PREVIEW':
       return { ...state, replyAttachmentPreviewEnabled: payload.replyAttachmentPreviewEnabled };
+    case 'SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER':
+      return {
+        ...state,
+        thumbnailCustomContentRenderer: payload.thumbnailCustomContentRenderer
+      };
     default:
       return state;
   }
