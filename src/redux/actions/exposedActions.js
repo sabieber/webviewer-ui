@@ -769,3 +769,8 @@ export const setToolDefaultStyleUpdateFromAnnotationPopupEnabled = (isToolDefaul
   type: 'SET_TOOL_DEFAULT_STYLE_UPDATE_FROM_ANNOTATION_POPUP_ENABLED',
   payload: isToolDefaultStyleUpdateFromAnnotationPopupEnabled
 });
+
+export const setThumbnailCustomContentRenderer = (thumbnailCustomContentRenderer) => ({
+  type: 'SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER',
+  payload: { thumbnailCustomContentRenderer }
+});

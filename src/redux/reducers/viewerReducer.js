@@ -803,6 +803,11 @@ export default (initialState) => (state = initialState, action) => {
       return { ...state, toolDefaultStyleUpdateFromAnnotationPopupEnabled: payload };
     case 'SET_SHORTCUT_KEY_MAP':
       return { ...state, shortcutKeyMap: payload };
+    case 'SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER':
+      return {
+        ...state,
+        thumbnailCustomContentRenderer: payload.thumbnailCustomContentRenderer
+      };
     default:
       return state;
   }

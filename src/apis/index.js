@@ -270,6 +270,7 @@ import { setCustomSettings, exportUserSettings, importUserSettings } from './use
 import addPanel from './addPanel';
 import setGrayscaleDarknessFactor from './setGrayscaleDarknessFactor';
 import { ALIGNMENT } from 'constants/customizationVariables';
+import setThumbnailCustomContentRenderer from './setThumbnailCustomContentRenderer';
 
 export default (store) => {
   const CORE_NAMESPACE = 'Core';
@@ -579,6 +580,9 @@ export default (store) => {
     getZoomStepFactors: getZoomStepFactors(store),
     setZoomStepFactors: setZoomStepFactors(store),
     getDocumentViewer,
+
+    // OXOMI custom
+    setThumbnailCustomContentRenderer: setThumbnailCustomContentRenderer(store),
   };
   const documentViewer = core.getDocumentViewer(1);
 
