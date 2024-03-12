@@ -264,7 +264,6 @@ const PrintModal = () => {
                   name="pages"
                   radio
                   label={t('option.print.all')}
-                  defaultChecked
                   disabled={isPrinting}
                   center
                 />
@@ -277,6 +276,7 @@ const PrintModal = () => {
                   label={t('option.print.current')}
                   disabled={isPrinting}
                   center
+                  defaultChecked
                 />
                 <Choice
                   dataElement="currentViewPrintOption"
