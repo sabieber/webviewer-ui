@@ -33,6 +33,7 @@ function PageNumberInput({
   ariaLabel,
   onError = noop,
   onBlurHandler = noop,
+  autoFocus = false
 }) {
   // Since we don't have page labels info we just assume page numbers as labels
   let pageLabels = Array.from({ length: pageCount }, (_, i) => (i + 1).toString());
@@ -121,6 +122,7 @@ function PageNumberInput({
           value={pageString}
           placeholder={placeholder}
           aria-describedby={hasError ? 'PageNumberInputError' : undefined}
+          autoFocus={autoFocus}
         />
         {hasError && <Icon glyph="icon-alert" />}
       </div>

@@ -141,6 +141,7 @@ const PrintModal = ({
             pageNumberError={pageNumberError}
             customPageLabels={pageLabels}
             enablePageLabels={true}
+            autoFocus={true}
           />
         </div>
       )}
