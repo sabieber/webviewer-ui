@@ -4,7 +4,6 @@ import classNames from 'classnames';
 import selectors from 'selectors';
 import useDidUpdate from 'hooks/useDidUpdate';
 import core from 'core';
-import selectors from 'selectors';
 import ThumbnailControls from 'components/ThumbnailControls';
 import thumbnailSelectionModes from 'constants/thumbnailSelectionModes';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +11,6 @@ import PropTypes from 'prop-types';
 
 import './Thumbnail.scss';
 import { Choice } from '@pdftron/webviewer-react-toolkit';
-import { useSelector } from 'react-redux';
 import getRootNode from 'helpers/getRootNode';
 import findFocusableElements from 'helpers/findFocusableElements';
 
