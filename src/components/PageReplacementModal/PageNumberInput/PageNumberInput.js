@@ -100,7 +100,6 @@ function PageNumberInput({
     const selectedPagesString = e.target.value.replace(/ /g, '');
     const pageNumbersArray = !selectedPagesString ? [] : getPageArrayFromString(selectedPagesString, pageLabels, pageCount, onError);
     const pageNumbersString = getPageString(pageNumbersArray);
-    setPageString(pageNumbersString);
 
     // Send info back to parent component
     onBlurHandler && onBlurHandler(pageNumbersArray);

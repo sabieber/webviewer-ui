@@ -133,10 +133,8 @@ const PrintModal = ({
         <div className={classNames('page-number-input-container', { error: !!pageNumberError })}>
           <PageNumberInput
             id="specifyPagesInput"
-            selectedPageNumbers={specifiedPages}
             pageCount={core.getTotalPages()}
             onSelectedPageNumbersChange={handlePageNumberChange}
-            onBlurHandler={setSpecifiedPages}
             onError={handlePageNumberError}
             pageNumberError={pageNumberError}
             customPageLabels={pageLabels}
