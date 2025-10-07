@@ -272,10 +272,23 @@ const TouchEventManager = {
 
         const { reachedLeft, reachedTop, reachedRight, reachedBottom } = this.reachedBoundary();
         const threshold = 0.1 * this.container.clientWidth;
-        const swipedToBottom = reachedBottom && this.touch.verticalDistance > threshold;
-        const swipedToTop = reachedTop && this.touch.verticalDistance < -threshold;
-        const swipedToRight = reachedRight && this.touch.horizontalDistance > threshold;
-        const swipedToLeft = reachedLeft && this.touch.horizontalDistance < -threshold;
+
+        // OXOMI custom start
+        let swipedToRight = false;
+        let swipedToLeft = false;
+        let swipedToBottom = false;
+        let swipedToTop = false;
+
+        if (Math.abs(this.touch.horizontalDistance) > Math.abs(this.touch.verticalDistance)) {
+          // horizontal swipe
+          swipedToRight = reachedRight && this.touch.horizontalDistance > threshold;
+          swipedToLeft = reachedLeft && this.touch.horizontalDistance < -threshold;
+        } else {
+          // vertical swipe
+          swipedToBottom = reachedBottom && this.touch.verticalDistance > threshold;
+          swipedToTop = reachedTop && this.touch.verticalDistance < -threshold;
+        }
+        // OXOMI custom end
 
         const currentPage = core.getCurrentPage();
         const totalPages = core.getTotalPages();
