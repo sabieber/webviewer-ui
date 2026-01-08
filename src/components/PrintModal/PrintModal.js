@@ -136,6 +136,7 @@ const PrintModal = ({
             onSelectedPageNumbersChange={handlePageNumberChange}
             onBlurHandler={setSpecifiedPages}
             onError={handlePageNumberError}
+            autoFocus={true}
           />
         </div>
       )}
