@@ -32,6 +32,7 @@ function PageNumberInput({
   onError = noop,
   onBlurHandler = noop,
   usePageIndexes = false,
+  autoFocus = false,
 }) {
 
   const [t] = useTranslation();
@@ -143,6 +144,7 @@ function PageNumberInput({
           value={pageString}
           placeholder={placeholder}
           aria-describedby={hasError ? 'PageNumberInputError' : undefined}
+          autoFocus={autoFocus}
         />
         {hasError && <Icon glyph="icon-alert" />}
       </div>

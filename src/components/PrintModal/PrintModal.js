@@ -134,6 +134,7 @@ const PrintModal = ({
             pageCount={core.getTotalPages()}
             onSelectedPageNumbersChange={setSpecifiedPages}
             onError={onError}
+            autoFocus={true}
           />
         </div>
       )}
