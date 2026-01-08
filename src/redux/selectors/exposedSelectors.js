@@ -1219,6 +1219,8 @@ export const isAnnotationToolStyleSyncingEnabled = (state) => state.viewer.annot
 
 export const getShortcutKeyMap = (state) => state.viewer.shortcutKeyMap;
 
+export const getThumbnailCustomContentRenderer = (state) => state.viewer.thumbnailCustomContentRenderer;
+
 export const getMultiViewerSyncScrollMode = (state) => state.viewer.multiViewerSyncScrollMode;
 
 export const getCompareAnnotationsMap = (state) => state.viewer.compareAnnotationsMap;
