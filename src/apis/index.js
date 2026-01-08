@@ -252,6 +252,7 @@ import { setCustomSettings, exportUserSettings, importUserSettings } from './use
 import addPanel from './addPanel';
 import setGrayscaleDarknessFactor from './setGrayscaleDarknessFactor';
 import { JUSTIFY_CONTENT, PRESET_BUTTON_TYPES } from 'constants/customizationVariables';
+import setThumbnailCustomContentRenderer from './setThumbnailCustomContentRenderer';
 import FlyoutsAPI from './FlyoutsAPI';
 import { getInstanceNode } from 'helpers/getRootNode';
 import { setClickMiddleware } from 'src/apis/setClickMiddleware';
@@ -614,6 +615,9 @@ export default (store, instanceDocViewerKey, instanceI18n, instanceRootNode) => 
     startTextComparison: startTextComparison(store),
     stopTextComparison,
     closeTooltip,
+
+    // OXOMI custom
+    setThumbnailCustomContentRenderer: setThumbnailCustomContentRenderer(store),
   };
   const documentViewerKey = instanceDocViewerKey || store.getState().advanced.documentViewerKey || 1;
   const documentViewer = core.getDocumentViewer(documentViewerKey);
