@@ -103,6 +103,8 @@ const Thumbnail = React.forwardRef((props, ref) => {
     return root.querySelector(`.ThumbnailsPanel.${panelSelector} #pageThumb${index}`);
   };
 
+  const [thumbnailCustomContentRenderer] = useSelector((state) => [selectors.getThumbnailCustomContentRenderer(state)]);
+
   const loadThumbnailAsync = () => {
     cancelPendingLoad();
     loadTimeoutRef.current = setTimeout(() => {
@@ -436,6 +438,11 @@ const Thumbnail = React.forwardRef((props, ref) => {
         )}
       </div>
       <div className="page-label">{pageLabel}</div>
+      { thumbnailCustomContentRenderer &&
+          <div className="customContent">
+            {thumbnailCustomContentRenderer(index, React)}
+          </div>
+      }
       {!isThumbnailSelectingPages && isActive && shouldShowControls && !isContentEditingEnabled && <ThumbnailControls index={index} />}
     </button>
   );

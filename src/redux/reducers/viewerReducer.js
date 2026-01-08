@@ -1267,6 +1267,11 @@ export default (initialState) => (state = initialState, action) => {
       return { ...state, viewportRelativeAnnotationPositioningEnabled: payload };
     case 'SET_SHORTCUT_KEY_MAP':
       return { ...state, shortcutKeyMap: payload };
+    case 'SET_THUMBNAIL_CUSTOM_CONTENT_RENDERER':
+      return {
+        ...state,
+        thumbnailCustomContentRenderer: payload.thumbnailCustomContentRenderer
+      };
     case 'SET_MULTI_VIEWER_SYNC_SCROLLING_MODE':
       return { ...state, multiViewerSyncScrollMode: payload };
     case 'SET_TEXT_SIGNATURE_CANVAS_MULTIPLIER':
